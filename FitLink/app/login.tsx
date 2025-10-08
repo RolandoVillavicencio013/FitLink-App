@@ -23,12 +23,12 @@ export default Login;
 
 const styles = StyleSheet.create({
   container: {
+    alignItems: 'center',
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center'
+    justifyContent: 'center'
   },
   text: {
-    marginBottom: 20,
-    fontSize: 18
+    fontSize: 18,
+    marginBottom: 20
   }
 });
