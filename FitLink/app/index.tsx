@@ -1,4 +1,3 @@
-// app/index.tsx
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 
@@ -6,8 +5,12 @@ export default function Index() {
   const router = useRouter();
 
   useEffect(() => {
-    router.replace('/login'); // Redirige a la pantalla de login
+    const timeout = setTimeout(() => {
+      router.replace('/login');
+    }, 0);
+
+    return () => clearTimeout(timeout);
   }, [router]);
 
-  return null; // No renderiza nada
+  return null;
 }
