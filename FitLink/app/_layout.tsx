@@ -20,9 +20,6 @@ const RootLayoutNav: React.FC = () => {
 
       {/* Pantallas privadas dentro de tabs */}
       <Stack.Screen name="(tabs)" />
-
-      {/* Modal opcional */}
-      <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
     </Stack>
   );
 };
