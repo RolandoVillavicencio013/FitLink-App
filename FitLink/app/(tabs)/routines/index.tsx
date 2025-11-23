@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
+import { useEffect, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator, FlatList, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { supabase } from '../../../services/supabase';
 import { theme } from '../../../constants/theme';
 import CustomButton from '../../../components/CustomButton';
 import { Pressable } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 // Para arrays, especificar el tipo de elementos que contiene
 interface RoutineExercisePreview {
@@ -26,10 +28,17 @@ export default function RoutinesScreen() {
   const router = useRouter();
   const [routines, setRoutines] = useState<routine[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  useEffect(() => {
-    loadRoutines();
-  }, []);
+  const filteredRoutines = routines.filter((routine) =>
+    routine.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      loadRoutines();
+    }, [])
+  );
 
   async function loadRoutines() {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
@@ -64,7 +73,8 @@ export default function RoutinesScreen() {
         exercise_id
       )
     `)
-    .eq('user_id', users.user_id);
+    .eq('user_id', users.user_id)
+    .order('created_at', { ascending: false });
 
     if (error) {
       console.error(error);
@@ -85,12 +95,8 @@ export default function RoutinesScreen() {
 
   return (
     <View style={styles.container}>
-      <CustomButton
-        label="Agregar rutina"
-        onPress={() => router.push('/new-routine')}
-      />
       <FlatList
-        data={routines}
+        data={filteredRoutines}
         keyExtractor={(item) => item.routine_id.toString()}
         renderItem={({ item }) => (
           <Pressable
@@ -109,6 +115,18 @@ export default function RoutinesScreen() {
             </Text>
           </Pressable>
         )}
+        ListHeaderComponent={
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Buscar rutina..."
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+        }
+      />
+      <CustomButton
+        label="Agregar rutina"
+        onPress={() => router.push('/new-routine')}
       />
     </View>
   );
@@ -124,8 +142,32 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   center: { alignItems: 'center', flex: 1, justifyContent: 'center' },
-  container: { padding: 20 },
-  exercises: {color: theme.colors.textSecondary, fontFamily: "Roboto_400Regular", fontSize: 16, marginBottom: 4},
-  time: {color: theme.colors.textSecondary, fontFamily: "Roboto_400Regular", fontSize: 16, },
-  title: { color: theme.colors.textPrimary, fontFamily: "Roboto_400Regular", fontSize: 16, fontWeight: 'bold', marginBottom: 8}
+  container: { flex: 1, marginBottom: -25, maxHeight: 580, padding: 20},
+  exercises: {
+    color: theme.colors.textSecondary, 
+    fontFamily: "Roboto_400Regular", 
+    fontSize: 16, 
+    marginBottom: 4
+  },
+  searchInput: {
+    borderColor: theme.colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    color: theme.colors.textSecondary,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16,
+    marginBottom: 15,
+    padding: 10,
+    width: '100%',
+  },
+  time: {
+    color: theme.colors.textSecondary,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16
+  },
+  title: { color: theme.colors.textPrimary,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16, fontWeight: 'bold',
+    marginBottom: 8
+  }
 });
