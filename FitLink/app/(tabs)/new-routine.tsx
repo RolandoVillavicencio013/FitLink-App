@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { View, TextInput, Switch, StyleSheet, Text, FlatList,
   KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { supabase } from '../services/supabase';
-import TabLayout from './(tabs)/_layout';
+import { supabase } from '../../services/supabase';
+import TabLayout from './_layout';
 import CustomButton from '@/components/CustomButton';
 import { theme } from '@/constants/theme';
 import { Pressable } from 'react-native';
@@ -103,7 +103,7 @@ export default function AddRoutineScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1 }}
+      style={{ flex: 1, marginBottom: 20 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView contentContainerStyle={styles.container}>
@@ -145,6 +145,8 @@ export default function AddRoutineScreen() {
         <FlatList
           data={filteredExercises}
           keyExtractor={(item) => item.exercise_id.toString()}
+          nestedScrollEnabled={true}
+          style={{ minHeight: 160, maxHeight: 160 }}
           renderItem={({ item }) => {
             const isSelected = selectedExercises.includes(item.exercise_id);
             return (
@@ -170,8 +172,12 @@ export default function AddRoutineScreen() {
           <Switch
             value={isShared}
             onValueChange={setIsShared}
-            trackColor={{ false: '#ccc', true: '#4CAF50' }}
-            thumbColor={isShared ? '#fff' : '#f4f3f4'}
+            trackColor={{ false: '#ccc', true: '#fff' }}
+            thumbColor={Platform.OS === 'android' 
+              ? (isShared ? theme.colors.primary : theme.colors.primary) 
+              : '#fff'}
+            ios_backgroundColor={theme.colors.border}
+
           />
         </View>
 
@@ -193,7 +199,7 @@ const styles = StyleSheet.create({
   exerciseItem: {
     alignItems: 'center',
     backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.divider,
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',  
