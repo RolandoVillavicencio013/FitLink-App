@@ -26,13 +26,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: theme.colors.primary,
     borderRadius: 8,
-    marginVertical: 6,
     marginBottom: 20,
+    marginVertical: 6,
     paddingHorizontal: 20,
     paddingVertical: 12,
     width: '100%',
   },
-  buttonHover: {
+  buttonPressed: {
     backgroundColor: theme.colors.primaryHover,
   },
   text: {

@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { supabase } from '../../services/supabase';
 import { theme } from '../../constants/theme';
 import CustomButton from '../../components/CustomButton';
-
+import { Pressable } from 'react-native';
 
 interface routine{
   routine_id: number;
@@ -88,11 +88,18 @@ export default function RoutinesScreen() {
         data={routines}
         keyExtractor={(item) => item.routine_id.toString()}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <Pressable
+            style={styles.card}
+            onPress={() => router.push(`/(tabs)/routines`)}
+          >
             <Text style={styles.title}>{item.name}</Text>
-            <Text style={styles.exercises}>{'Cantidad de ejercicios: ' + (item.routine_exercises?.length ?? 0)}</Text>
-            <Text style={styles.time}>{'Tiempo estimado: ' + item.estimated_time + ' minutos'}</Text>
-          </View>
+            <Text style={styles.exercises}>
+              {'Cantidad de ejercicios: ' + (item.routine_exercises?.length ?? 0)}
+            </Text>
+            <Text style={styles.time}>
+              {'Tiempo estimado: ' + item.estimated_time + ' minutos'}
+            </Text>
+          </Pressable>
         )}
       />
     </View>
