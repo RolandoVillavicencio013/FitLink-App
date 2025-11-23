@@ -49,7 +49,7 @@ export default function AddRoutineScreen() {
       const bSelected = selectedExercises.includes(b.exercise_id);
       if (aSelected && !bSelected) return -1;
       if (!aSelected && bSelected) return 1;
-      return 0; // mantener orden
+      return 0;
   });
 
   async function handleAddRoutine() {
@@ -70,7 +70,6 @@ export default function AddRoutineScreen() {
         newErrors.sets = "Debes ingresar el número de sets para cada ejercicio";
       }
     }
-
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -105,16 +104,21 @@ export default function AddRoutineScreen() {
       .select('routine_id')
       .single();
 
-    if (error || routineData) {
+    if (error) {
       console.error(error);
-      return
+      return;
+    }
+
+    if (!routineData) {
+      console.error("No se devolvió routineData");
+      return;
     }
 
     const routineId = routineData.routine_id;
     const routineExercises = selectedExercises.map((exerciseId) => ({
       routine_id: routineId,
       exercise_id: exerciseId,
-      sets: Number(exerciseSets[exerciseId] || 0), // 👈 guarda los sets
+      sets: Number(exerciseSets[exerciseId] || 0),
     }));
 
     const { error: routineExercisesError } = await supabase
@@ -125,7 +129,7 @@ export default function AddRoutineScreen() {
     if (routineExercisesError) {
       console.error(routineExercisesError);
     } else {
-      router.back();
+      router.replace("/(tabs)/routines");
     }
   }
 
@@ -327,8 +331,8 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
     marginBottom: 10,
-    marginTop: 10,
     marginRight: 10,
+    marginTop: 10,
     paddingLeft: 3,
   },
   row: {
