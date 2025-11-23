@@ -12,6 +12,11 @@ Before you begin, make sure you have the following installed:
 
 - Node.js (v18 or higher recommended). You can download it [here](https://nodejs.org/).
 
+## Dependency Management
+
+FitLink uses the package versions recommended by Expo for maximum compatibility and stability. While some internal dependencies may show deprecation warnings, following Expo’s suggestions ensures that the app works reliably across platforms and with Expo tooling. This approach is preferred over always using the latest package versions, as Expo maintains and tests its supported versions for seamless integration.  
+If you choose to update dependencies beyond Expo’s recommendations, you may encounter compatibility issues or unexpected behavior.
+
 ## Project Setup
 
 ### 1. Clone the Project
