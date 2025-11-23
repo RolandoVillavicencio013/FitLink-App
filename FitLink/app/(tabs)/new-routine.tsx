@@ -23,6 +23,7 @@ export default function AddRoutineScreen() {
   const [exerciseSets, setExerciseSets] = useState<{ [key: number]: string }>({});
   const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
     async function loadExercises() {
@@ -52,6 +53,30 @@ export default function AddRoutineScreen() {
   });
 
   async function handleAddRoutine() {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!name.trim()) newErrors.name = "El nombre es requerido";
+    if (!description.trim()) newErrors.description = "La descripción es requerida";
+    if (!estimatedTime.trim() || isNaN(Number(estimatedTime))) {
+      newErrors.estimatedTime = "El tiempo estimado debe ser un número";
+    }
+    if (selectedExercises.length === 0) {
+      newErrors.exercises = "Debes seleccionar al menos un ejercicio";
+    } else {
+      const invalidSets = selectedExercises.some(
+        (id) => !exerciseSets[id] || Number(exerciseSets[id]) <= 0
+      );
+      if (invalidSets) {
+        newErrors.sets = "Debes ingresar el número de sets para cada ejercicio";
+      }
+    }
+
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
@@ -115,17 +140,36 @@ export default function AddRoutineScreen() {
           style={styles.input}
           placeholder="Nombre"
           value={name}
-          onChangeText={setName}
+          onChangeText={(text) => {
+            setName(text);
+            if (errors.name && text.trim()) {
+              setErrors((prev) => {
+                const { name, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
+
         />
+        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
         <Text style={styles.label}>Descripción de la rutina</Text>
         <TextInput
           style={[styles.input, styles.description]}
           placeholder="Descripción"
           value={description}
-          onChangeText={setDescription}
+          onChangeText={(text) => {
+            setDescription(text);
+            if (errors.description && text.trim()) {
+              setErrors((prev) => {
+                const { description, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
           multiline
         />
+        {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
 
         <Text style={styles.label}>Tiempo estimado</Text>
         <TextInput
@@ -134,8 +178,17 @@ export default function AddRoutineScreen() {
           keyboardType="numeric"
           inputMode="numeric"
           value={estimatedTime}
-          onChangeText={setEstimatedTime}
+          onChangeText={(text) => {
+            setEstimatedTime(text);
+            if (errors.estimatedTime && text.trim() && !isNaN(Number(text))) {
+              setErrors((prev) => {
+                const { estimatedTime, ...rest } = prev;
+                return rest;
+              });
+            }
+          }}
         />
+        {errors.estimatedTime && <Text style={styles.errorText}>{errors.estimatedTime}</Text>}
 
         <Text style={styles.label}>Ejercicios</Text>
         <TextInput
@@ -149,7 +202,7 @@ export default function AddRoutineScreen() {
           data={filteredExercises}
           keyExtractor={(item) => item.exercise_id.toString()}
           nestedScrollEnabled={true}
-          style={{ minHeight: 160, maxHeight: 200 }}
+          style={{ minHeight: 147, maxHeight: 200 }}
           renderItem={({ item }) => {
             const isSelected = selectedExercises.includes(item.exercise_id);
             return (
@@ -164,6 +217,12 @@ export default function AddRoutineScreen() {
                       setExerciseSets(newSets);
                     } else {
                       setSelectedExercises([...selectedExercises, item.exercise_id]);
+                      if (errors.exercises) {
+                        setErrors((prev) => {
+                          const { exercises, ...rest } = prev;
+                          return rest;
+                        });
+                      }
                     }
                   }}
                 >
@@ -176,18 +235,31 @@ export default function AddRoutineScreen() {
                     placeholder="Sets"
                     keyboardType="numeric"
                     value={exerciseSets[item.exercise_id] || ''}
-                    onChangeText={(text) =>
-                      setExerciseSets({ ...exerciseSets, [item.exercise_id]: text })
-                    }
+                    onChangeText={(text) =>{
+                      setExerciseSets({ ...exerciseSets, [item.exercise_id]: text });
+                      if (errors.sets && Number(text) > 0) {
+                        setErrors((prev) => {
+                          const { sets, ...rest } = prev;
+                          return rest;
+                        });
+                      }
+                    }}
                   />
                 )}
               </View>
             );
           }}
         />
+        {errors.exercises && (
+          <Text style={styles.errorText}>{errors.exercises}</Text>
+        )}
+        {errors.sets && (
+          <Text style={styles.errorText}>{errors.sets}</Text>
+        )}
+
 
         <View style={styles.row}>
-          <Text style={styles.label}>Compartir</Text>
+          <Text style={[styles.label, styles.share]}>Compartir</Text>
           <Switch
             value={isShared}
             onValueChange={setIsShared}
@@ -208,8 +280,16 @@ export default function AddRoutineScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: { flex: 1, padding: 20, paddingTop: 10 },
   description: {minHeight: 120},
+  errorText: {
+    color: theme.colors.error,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 14,
+    marginBottom: 8,
+    marginLeft: 5,
+    marginTop: 5
+  },
   exerciseItem: {
     alignItems: 'center',
     backgroundColor: theme.colors.surface,
@@ -238,7 +318,7 @@ const styles = StyleSheet.create({
     color: theme.colors.textSecondary,
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
-    marginBottom: 22,
+    marginBottom: 5,
     padding: 10,
     width: '100%',
   },
@@ -247,6 +327,7 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
     marginBottom: 10,
+    marginTop: 10,
     marginRight: 10,
     paddingLeft: 3,
   },
@@ -276,7 +357,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     padding: 6,
     textAlign: 'center',
-    width: 60, // pequeño campo numérico
-},
-
+    width: 60,
+  },
+  share: {marginRight: 18, marginTop: 0},
 });
