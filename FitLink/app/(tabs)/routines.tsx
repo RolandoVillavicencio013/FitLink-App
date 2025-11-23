@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList } from 'react-native';
+import { useRouter } from 'expo-router';
 import { supabase } from '../../services/supabase';
 import { theme } from '../../constants/theme';
+import CustomButton from '../../components/CustomButton';
+
 
 interface routine{
   routine_id: number;
@@ -15,6 +18,7 @@ interface routine{
 }
 
 export default function RoutinesScreen() {
+  const router = useRouter();
   const [routines, setRoutines] = useState<routine[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -76,7 +80,10 @@ export default function RoutinesScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.message} >Haz click en una rutina para ver mas detalles</Text>
+      <CustomButton
+        label="Agregar rutina"
+        onPress={() => router.push('/new-routine')}
+      />
       <FlatList
         data={routines}
         keyExtractor={(item) => item.routine_id.toString()}
@@ -104,7 +111,6 @@ const styles = StyleSheet.create({
   center: { alignItems: 'center', flex: 1, justifyContent: 'center' },
   container: { padding: 20 },
   exercises: {color: theme.colors.textSecondary, fontFamily: "Roboto_400Regular", fontSize: 16, marginBottom: 4},
-  message: {  color: theme.colors.textPrimary, fontFamily: "Roboto_400Regular", fontSize: 17.5, marginBottom: 20,},
   time: {color: theme.colors.textSecondary, fontFamily: "Roboto_400Regular", fontSize: 16, },
-  title: { color: theme.colors.textPrimary, fontFamily: "Roboto_400Regular", fontSize: 16, fontWeight: 'bold', marginBottom: 8},
+  title: { color: theme.colors.textPrimary, fontFamily: "Roboto_400Regular", fontSize: 16, fontWeight: 'bold', marginBottom: 8}
 });
