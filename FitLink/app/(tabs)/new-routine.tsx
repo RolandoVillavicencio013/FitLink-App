@@ -20,6 +20,7 @@ export default function AddRoutineScreen() {
   const [estimatedTime, setEstimatedTime] = useState('');
   const [isShared, setIsShared] = useState(false);
   const [exercises, setExercises] = useState<exercise[]>([]);
+  const [exerciseSets, setExerciseSets] = useState<{ [key: number]: string }>({});
   const [selectedExercises, setSelectedExercises] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -88,11 +89,13 @@ export default function AddRoutineScreen() {
     const routineExercises = selectedExercises.map((exerciseId) => ({
       routine_id: routineId,
       exercise_id: exerciseId,
+      sets: Number(exerciseSets[exerciseId] || 0), // 👈 guarda los sets
     }));
 
     const { error: routineExercisesError } = await supabase
       .from('routine_exercises')
       .insert(routineExercises);
+
 
     if (routineExercisesError) {
       console.error(routineExercisesError);
@@ -146,23 +149,39 @@ export default function AddRoutineScreen() {
           data={filteredExercises}
           keyExtractor={(item) => item.exercise_id.toString()}
           nestedScrollEnabled={true}
-          style={{ minHeight: 160, maxHeight: 160 }}
+          style={{ minHeight: 160, maxHeight: 200 }}
           renderItem={({ item }) => {
             const isSelected = selectedExercises.includes(item.exercise_id);
             return (
-              <Pressable
-                style={[styles.exerciseItem, isSelected && styles.exerciseSelected]}
-                onPress={() => {
-                  if (isSelected) {
-                    setSelectedExercises(selectedExercises.filter(id => id !== item.exercise_id));
-                  } else {
-                    setSelectedExercises([...selectedExercises, item.exercise_id]);
-                  }
-                }}
-              >
-                <Text style={styles.exerciseText}>{item.name}</Text>
-                {isSelected && <Text style={styles.checkmark}>✓</Text>}
-              </Pressable>
+              <View style={[styles.exerciseItem, isSelected && styles.exerciseSelected]}>
+                <Pressable
+                  style={{ flex: 1 }}
+                  onPress={() => {
+                    if (isSelected) {
+                      setSelectedExercises(selectedExercises.filter(id => id !== item.exercise_id));
+                      const newSets = { ...exerciseSets };
+                      delete newSets[item.exercise_id];
+                      setExerciseSets(newSets);
+                    } else {
+                      setSelectedExercises([...selectedExercises, item.exercise_id]);
+                    }
+                  }}
+                >
+                  <Text style={styles.exerciseText}>{item.name}</Text>
+                </Pressable>
+
+                {isSelected && (
+                  <TextInput
+                    style={styles.setsInput}
+                    placeholder="Sets"
+                    keyboardType="numeric"
+                    value={exerciseSets[item.exercise_id] || ''}
+                    onChangeText={(text) =>
+                      setExerciseSets({ ...exerciseSets, [item.exercise_id]: text })
+                    }
+                  />
+                )}
+              </View>
             );
           }}
         />
@@ -189,11 +208,6 @@ export default function AddRoutineScreen() {
 }
 
 const styles = StyleSheet.create({
-  checkmark: {
-    color: theme.colors.primary,
-    fontFamily: "Roboto_700Bold",
-    fontSize: 18,
-  },
   container: { flex: 1, padding: 20 },
   description: {minHeight: 120},
   exerciseItem: {
@@ -203,7 +217,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     flexDirection: 'row',  
-    height: 32,             
+    height: 40,             
     justifyContent: 'space-between', 
     marginBottom: 10,    
     padding: 12,
@@ -252,4 +266,17 @@ const styles = StyleSheet.create({
     padding: 10,
     width: '100%',
   },
+  setsInput: {
+    borderColor: theme.colors.borderSecondary,
+    borderRadius: 6,
+    borderWidth: 1,
+    color: theme.colors.textSecondary,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 14,
+    marginLeft: 10,
+    padding: 6,
+    textAlign: 'center',
+    width: 60, // pequeño campo numérico
+},
+
 });

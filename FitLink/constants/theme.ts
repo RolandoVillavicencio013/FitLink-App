@@ -10,5 +10,6 @@ export const theme = {
     error: "#F44336",          // rojo para error
     divider: "#2A2A2A",         // gris intermedio para separadores
     border: "#b593fdff",
+    borderSecondary: "#4e4e4eff"
   }
 };
