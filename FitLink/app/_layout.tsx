@@ -1,8 +1,29 @@
 import { Stack } from 'expo-router';
 import React from 'react';
 import { theme } from '../constants/theme';
+import { useFonts } from "expo-font";
+import {
+  Roboto_400Regular,
+  Roboto_500Medium,
+  Roboto_700Bold,
+} from "@expo-google-fonts/roboto";
+import { ActivityIndicator, View } from "react-native";
 
 const RootLayout: React.FC = () => {
+  const [fontsLoaded] = useFonts({
+    Roboto_400Regular,
+    Roboto_500Medium,
+    Roboto_700Bold,
+  });
+
+  if (!fontsLoaded) {
+    return (
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+  
   return <RootLayoutNav />;
 };
 
