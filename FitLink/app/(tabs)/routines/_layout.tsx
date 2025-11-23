@@ -5,13 +5,18 @@ import React from 'react';
 
 export default function RoutinesLayout() {
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      <Stack.Screen name="index" />
-      <Stack.Screen name="[id]" />
+    <Stack>
+      <Stack.Screen 
+        name="index" 
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="[id]" 
+        options={{ 
+          headerShown: false,
+          title: "Detalle de Rutina"
+        }}
+      />
     </Stack>
   );
 }
