@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, ActivityIndicator, ScrollView, Alert, StyleSheet } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import { supabase } from '../../../services/supabase';
 import { theme } from '../../../constants/theme';
+import CustomButton from '../../../components/CustomButton';
 
-// Tipos de datos
 interface Exercise {
   exercise_id: number;
   name: string;
@@ -26,25 +26,37 @@ interface RoutineDetail {
 
 export default function RoutineDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const [routine, setRoutine] = useState<RoutineDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) {
-      loadRoutineDetail();
-    }
-  }, [id]);
+  useEffect(() => { if (id) loadRoutineDetail(); }, [id]);
 
   async function loadRoutineDetail() {
-    setLoading(true);
-    const { data } = await supabase
-      .from('routines')
-      .select(`routine_id,name,description,estimated_time,routine_exercises (routine_exercise_id,order,sets,exercises (exercise_id,name,description))`)
-      .eq('routine_id', id)
-      .single();
-    setRoutine(data);
-    setLoading(false);
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('routines')
+        .select(`routine_id,name,description,estimated_time,routine_exercises (routine_exercise_id,order,sets,exercises (exercise_id,name,description))`)
+        .eq('routine_id', id)
+        .single();
+      if (error) {
+        Alert.alert('Error', 'No se pudo cargar la rutina');
+        router.back();
+        return;
+      }
+      setRoutine(data);
+    } catch {
+      Alert.alert('Error', 'Ocurrió un error inesperado');
+      router.back();
+    } finally {
+      setLoading(false);
+    }
   }
+
+  const handleGoBack = () => router.back();
+  const handleEdit = () => Alert.alert('En desarrollo', 'La función de editar aún no está implementada');
+  const handleDelete = () => Alert.alert('En desarrollo', 'La función de eliminar aún no está implementada');
 
   if (loading) {
     return (
@@ -59,6 +71,7 @@ export default function RoutineDetailScreen() {
     return (
       <View style={styles.center}>
         <Text>No se encontró la rutina</Text>
+        <CustomButton label="Volver" onPress={handleGoBack} />
       </View>
     );
   }
@@ -68,10 +81,13 @@ export default function RoutineDetailScreen() {
       <View style={styles.header}>
         <Text style={styles.title}>{routine.name}</Text>
         <Text>{routine.estimated_time} minutos</Text>
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Descripción</Text>
         <Text>{routine.description || 'Sin descripción'}</Text>
       </View>
-      <View>
-        <Text>Ejercicios:</Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Ejercicios</Text>
         {routine.routine_exercises && routine.routine_exercises.length > 0 ? (
           routine.routine_exercises.map((exercise) => (
             <View key={exercise.routine_exercise_id} style={styles.exerciseCard}>
@@ -83,6 +99,11 @@ export default function RoutineDetailScreen() {
           <Text>No hay ejercicios en esta rutina</Text>
         )}
       </View>
+      <View style={styles.buttonsContainer}>
+        <CustomButton label="Editar rutina" onPress={handleEdit} />
+        <CustomButton label="Eliminar rutina" onPress={handleDelete} />
+        <CustomButton label="Volver al listado" onPress={handleGoBack} />
+      </View>
     </ScrollView>
   );
 }
@@ -92,5 +113,8 @@ const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
   header: { marginBottom: 20, padding: 20 },
   title: { fontSize: 28, fontWeight: 'bold', color: theme.colors.textPrimary },
+  section: { marginBottom: 25, paddingHorizontal: 20 },
+  sectionTitle: { fontWeight: 'bold', fontSize: 18, marginBottom: 10 },
   exerciseCard: { marginBottom: 16, padding: 10, backgroundColor: theme.colors.surface },
+  buttonsContainer: { marginTop: 20, gap: 12, paddingHorizontal: 20, paddingBottom: 20 }
 });
