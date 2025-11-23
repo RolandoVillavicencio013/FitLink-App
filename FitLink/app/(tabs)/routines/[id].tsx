@@ -1,9 +1,16 @@
-import { useEffect, useState } from 'react';
-import { View, Text, ActivityIndicator, ScrollView, Alert, StyleSheet } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { supabase } from '../../../services/supabase';
-import { theme } from '../../../constants/theme';
-import CustomButton from '../../../components/CustomButton';
+import { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+} from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { supabase } from "../../../services/supabase";
+import { theme } from "../../../constants/theme";
+import CustomButton from "../../../components/CustomButton";
 
 interface Exercise {
   exercise_id: number;
@@ -30,24 +37,55 @@ export default function RoutineDetailScreen() {
   const [routine, setRoutine] = useState<RoutineDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => { if (id) loadRoutineDetail(); }, [id]);
+  useEffect(() => {
+    if (id) loadRoutineDetail();
+  }, [id]);
 
   async function loadRoutineDetail() {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('routines')
-        .select(`routine_id,name,description,estimated_time,routine_exercises (routine_exercise_id,order,sets,exercises (exercise_id,name,description))`)
-        .eq('routine_id', id)
+        .from("routines")
+        .select(`
+          routine_id,
+          name,
+          description,
+          estimated_time,
+          routine_exercises (
+            routine_exercise_id,
+            order,
+            sets,
+            exercises (
+              exercise_id,
+              name,
+              description
+            )
+          )
+        `)
+        .eq("routine_id", id)
         .single();
       if (error) {
-        Alert.alert('Error', 'No se pudo cargar la rutina');
+        Alert.alert("Error", "No se pudo cargar la rutina");
         router.back();
         return;
       }
-      setRoutine(data);
-    } catch {
-      Alert.alert('Error', 'Ocurrió un error inesperado');
+      // Ordenamos por 'order'
+      if (data.routine_exercises) {
+        data.routine_exercises.sort((a, b) => a.order - b.order);
+      }
+      const processedData: RoutineDetail = {
+        ...data,
+        routine_exercises:
+          data.routine_exercises?.map((re: any) => ({
+            routine_exercise_id: re.routine_exercise_id,
+            order: re.order,
+            sets: re.sets,
+            exercises: re.exercises || null,
+          })) || [],
+      };
+      setRoutine(processedData);
+    } catch (err) {
+      Alert.alert("Error", "Ocurrió un error inesperado");
       router.back();
     } finally {
       setLoading(false);
@@ -55,14 +93,41 @@ export default function RoutineDetailScreen() {
   }
 
   const handleGoBack = () => router.back();
-  const handleEdit = () => Alert.alert('En desarrollo', 'La función de editar aún no está implementada');
-  const handleDelete = () => Alert.alert('En desarrollo', 'La función de eliminar aún no está implementada');
+
+  const handleEdit = () => {
+    Alert.alert(
+      "En desarrollo",
+      "La función de editar aún no está implementada"
+    );
+    // TODO: router.push(`/edit-routine/${id}`);
+  };
+
+  const handleDelete = () => {
+    Alert.alert(
+      "Eliminar rutina",
+      "¿Estás seguro de que deseas eliminar esta rutina?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            // TODO: Implementar lógica de eliminación
+            Alert.alert(
+              "En desarrollo",
+              "La función de eliminar aún no está implementada"
+            );
+          },
+        },
+      ]
+    );
+  };
 
   if (loading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={theme.colors.primary} />
-        <Text>Cargando rutina...</Text>
+        <Text style={styles.loadingText}>Cargando rutina...</Text>
       </View>
     );
   }
@@ -70,33 +135,58 @@ export default function RoutineDetailScreen() {
   if (!routine) {
     return (
       <View style={styles.center}>
-        <Text>No se encontró la rutina</Text>
+        <Text style={styles.errorText}>No se encontró la rutina</Text>
         <CustomButton label="Volver" onPress={handleGoBack} />
       </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <View style={styles.header}>
         <Text style={styles.title}>{routine.name}</Text>
-        <Text>{routine.estimated_time} minutos</Text>
+        <Text style={styles.time}>{routine.estimated_time} minutos</Text>
       </View>
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Descripción</Text>
-        <Text>{routine.description || 'Sin descripción'}</Text>
+        <Text style={styles.description}>
+          {routine.description || "Sin descripción"}
+        </Text>
       </View>
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Ejercicios</Text>
+        <Text style={styles.sectionTitle}>
+          Ejercicios ({routine.routine_exercises?.length || 0})
+        </Text>
         {routine.routine_exercises && routine.routine_exercises.length > 0 ? (
-          routine.routine_exercises.map((exercise) => (
-            <View key={exercise.routine_exercise_id} style={styles.exerciseCard}>
-              <Text>{exercise.exercises?.name || 'Ejercicio sin nombre'}</Text>
-              <Text>Series: {exercise.sets}</Text>
+          routine.routine_exercises.map((exercise, index) => (
+            <View
+              key={exercise.routine_exercise_id}
+              style={styles.exerciseCard}
+            >
+              <View style={styles.exerciseHeader}>
+                <Text style={styles.exerciseNumber}>{index + 1}</Text>
+                <View style={styles.exerciseInfo}>
+                  <Text style={styles.exerciseName}>
+                    {exercise.exercises?.name || "Ejercicio sin nombre"}
+                  </Text>
+                  {exercise.exercises?.description && (
+                    <Text style={styles.exerciseDescription}>
+                      {exercise.exercises.description}
+                    </Text>
+                  )}
+                </View>
+              </View>
+              <View style={styles.exerciseDetails}>
+                <Text style={styles.detailText}>Series: {exercise.sets}</Text>
+                {/* TODO: Agregar descansos */}
+              </View>
             </View>
           ))
         ) : (
-          <Text>No hay ejercicios en esta rutina</Text>
+          <Text style={styles.emptyText}>No hay ejercicios en esta rutina</Text>
         )}
       </View>
       <View style={styles.buttonsContainer}>
@@ -110,11 +200,73 @@ export default function RoutineDetailScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
-  center: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 },
-  header: { marginBottom: 20, padding: 20 },
-  title: { fontSize: 28, fontWeight: 'bold', color: theme.colors.textPrimary },
-  section: { marginBottom: 25, paddingHorizontal: 20 },
-  sectionTitle: { fontWeight: 'bold', fontSize: 18, marginBottom: 10 },
-  exerciseCard: { marginBottom: 16, padding: 10, backgroundColor: theme.colors.surface },
-  buttonsContainer: { marginTop: 20, gap: 12, paddingHorizontal: 20, paddingBottom: 20 }
+  contentContainer: { padding: 20 },
+  center: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  header: { marginBottom: 20 },
+  title: { fontSize: 28, fontWeight: "bold", color: theme.colors.textPrimary },
+  time: { color: theme.colors.textSecondary, fontSize: 16, marginTop: 5 },
+  section: { marginBottom: 25 },
+  sectionTitle: {
+    color: theme.colors.textPrimary,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  description: {
+    color: theme.colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  exerciseCard: {
+    backgroundColor: theme.colors.surface,
+    borderLeftColor: theme.colors.primary,
+    borderLeftWidth: 4,
+    borderRadius: 8,
+    marginBottom: 12,
+    padding: 15,
+  },
+  exerciseHeader: { flexDirection: "row", gap: 12 },
+  exerciseNumber: {
+    alignSelf: "flex-start",
+    backgroundColor: theme.colors.primary,
+    borderRadius: 15,
+    color: theme.colors.textPrimary,
+    fontSize: 14,
+    fontWeight: "bold",
+    height: 30,
+    lineHeight: 30,
+    minWidth: 30,
+    textAlign: "center",
+  },
+  exerciseInfo: { flex: 1 },
+  exerciseName: {
+    color: theme.colors.textPrimary,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  exerciseDescription: {
+    color: theme.colors.textSecondary,
+    fontSize: 13,
+    marginTop: 4,
+  },
+  exerciseDetails: {
+    borderTopColor: theme.colors.divider,
+    borderTopWidth: 1,
+    marginTop: 10,
+    paddingTop: 10,
+  },
+  detailText: { color: theme.colors.textSecondary, fontSize: 14 },
+  emptyText: {
+    color: theme.colors.textSecondary,
+    fontStyle: "italic",
+    textAlign: "center",
+  },
+  errorText: { color: theme.colors.error, fontSize: 18, marginBottom: 20 },
+  loadingText: { color: theme.colors.textSecondary, marginTop: 10 },
+  buttonsContainer: { gap: 12, marginTop: 20, paddingBottom: 20 },
 });
