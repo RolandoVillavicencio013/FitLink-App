@@ -126,7 +126,7 @@ export default function RoutinesScreen() {
       />
       <CustomButton
         label="Agregar rutina"
-        onPress={() => router.push('/new-routine')}
+        onPress={() => router.push('/routines/add-routine')}
       />
     </View>
   );
