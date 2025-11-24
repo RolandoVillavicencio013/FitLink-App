@@ -204,7 +204,7 @@ export default function AddRoutineScreen() {
         <FlatList
           data={filteredExercises}
           keyExtractor={(item) => item.exercise_id.toString()}
-          nestedScrollEnabled={true}
+          scrollEnabled={false}
           style={{ minHeight: 147, maxHeight: 200 }}
           renderItem={({ item }) => {
             const isSelected = selectedExercises.includes(item.exercise_id);
@@ -275,11 +275,8 @@ export default function AddRoutineScreen() {
           />
         </View>
 
-<<<<<<<< HEAD:FitLink/app/(tabs)/routines/add-routine.tsx
         <CustomButton label="Guardar rutina" onPress={() => handleAddRoutine()} />
-========
-        <CustomButton label="Guardar rutina" onPress={() => handleAddRoutine()} />r
->>>>>>>> 0178a21b5d83c4ebd18ec6eac9419da081547ea9:FitLink/app/(tabs)/routines/new-routine.tsx
+
       </ScrollView>
     </KeyboardAvoidingView>
   );

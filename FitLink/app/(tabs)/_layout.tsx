@@ -59,13 +59,6 @@ const TabLayout: React.FC = () => {
             tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
           }}
         />
-        <Tabs.Screen
-          name="new-routine"
-          options={{
-            title: "Agregar nueva rutina",
-            href: null,
-          }}
-        />
       </Tabs>
     </View>
   );
