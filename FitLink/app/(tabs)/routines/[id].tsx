@@ -7,11 +7,12 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
 import { supabase } from "../../../services/supabase";
 import { theme } from "../../../constants/theme";
 import CustomButton from "../../../components/CustomButton";
 import { deleteRoutine } from "../../../services/delete-routine";
+import { useCallback } from "react";
 
 interface Exercise {
   exercise_id: number;
@@ -40,9 +41,11 @@ export default function RoutineDetailScreen() {
   const [routine, setRoutine] = useState<RoutineDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) loadRoutineDetail();
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      if (id) loadRoutineDetail();
+    }, [id])
+  );
 
   async function loadRoutineDetail() {
     try {
@@ -97,18 +100,10 @@ export default function RoutineDetailScreen() {
     }
   }
 
-  const handleGoBack = () => router.back();
-
   const handleEdit = () => {
-    Alert.alert(
-      "En desarrollo",
-      "La función de editar aún no está implementada"
-    );
-    // @ts-ignore
-    router.push(`/edit-routine/${id}`);
+    router.push(`/(tabs)/routines/edit-routine/${id}`);
   };
 
-  // TODO: Considerar implementar el patrón Strategy acá
   const handleDelete = () => {
     deleteRoutine({
       routineId: id as string,
@@ -129,7 +124,6 @@ export default function RoutineDetailScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.errorText}>No se encontró la rutina</Text>
-        <CustomButton label="Volver" onPress={handleGoBack} />
       </View>
     );
   }
@@ -206,7 +200,6 @@ export default function RoutineDetailScreen() {
       <View style={styles.buttonsContainer}>
         <CustomButton label="Editar rutina" onPress={handleEdit} />
         <CustomButton label="Eliminar rutina" onPress={handleDelete} />
-        <CustomButton label="Volver al listado" onPress={handleGoBack} />
       </View>
     </ScrollView>
   );
