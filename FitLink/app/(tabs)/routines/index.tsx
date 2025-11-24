@@ -102,8 +102,7 @@ export default function RoutinesScreen() {
           <Pressable
             style={styles.card}
             onPress={() => {
-              // @ts-ignore
-              router.push(`/routines/${item.routine_id}`);
+              router.push(`/(tabs)/routines/${item.routine_id}`);
             }}
           >
             <Text style={styles.title}>{item.name}</Text>
@@ -142,7 +141,11 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   center: { alignItems: 'center', flex: 1, justifyContent: 'center' },
-  container: { flex: 1, marginBottom: -25, maxHeight: 580, padding: 20},
+  container: { 
+    backgroundColor: theme.colors.background,
+    flex: 1, 
+    padding: 20
+  },
   exercises: {
     color: theme.colors.textSecondary, 
     fontFamily: "Roboto_400Regular", 
