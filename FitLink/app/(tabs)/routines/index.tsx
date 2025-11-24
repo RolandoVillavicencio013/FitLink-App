@@ -1,12 +1,17 @@
 import { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../services/supabase';
-import { theme } from '../../constants/theme';
-import CustomButton from '../../components/CustomButton';
+import { supabase } from '../../../services/supabase';
+import { theme } from '../../../constants/theme';
+import CustomButton from '../../../components/CustomButton';
 import { Pressable } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
+
+// Para arrays, especificar el tipo de elementos que contiene
+interface RoutineExercisePreview {
+  exercise_id: number;
+}
 
 interface routine{
   routine_id: number;
@@ -16,7 +21,7 @@ interface routine{
   created_at: string;
   user_id: string;
   estimated_time: number;
-  routine_exercises: [];
+  routine_exercises: RoutineExercisePreview[];
 }
 
 export default function RoutinesScreen() {
@@ -39,7 +44,7 @@ export default function RoutinesScreen() {
     const { data: { user }, error: userError } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      console.error(userError);
+      setLoading(false);
       return;
     }
 
@@ -50,7 +55,7 @@ export default function RoutinesScreen() {
       .single();
 
     if (usersError || !users) {
-      console.error(userError);
+      setLoading(false);
       return;
     }
 
@@ -96,7 +101,10 @@ export default function RoutinesScreen() {
         renderItem={({ item }) => (
           <Pressable
             style={styles.card}
-            onPress={() => router.push(`/(tabs)/routines`)}
+            onPress={() => {
+              // @ts-ignore
+              router.push(`/routines/${item.routine_id}`);
+            }}
           >
             <Text style={styles.title}>{item.name}</Text>
             <Text style={styles.exercises}>
