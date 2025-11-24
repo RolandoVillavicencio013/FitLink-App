@@ -6,12 +6,12 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
-  Platform,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "../../../services/supabase";
 import { theme } from "../../../constants/theme";
 import CustomButton from "../../../components/CustomButton";
+import { deleteRoutine } from "../../../services/delete-routine";
 
 interface Exercise {
   exercise_id: number;
@@ -104,76 +104,11 @@ export default function RoutineDetailScreen() {
   };
 
   // TODO: Considerar implementar el patrón Strategy acá
-  const handleDelete = async () => {
-    if (Platform.OS === 'web') {
-      const confirmed = window.confirm('¿Estás seguro de que deseas eliminar esta rutina?');
-      
-      if (!confirmed) {
-        return;
-      }
-
-      try {
-        const { error } = await supabase
-          .from('routines')
-          .delete()
-          .eq('routine_id', id);
-
-        if (error) {
-          console.error('Error eliminando rutina:', error);
-          alert('Error: No se pudo eliminar la rutina');
-          return;
-        }
-
-        alert('La rutina se eliminó correctamente');
-        router.back();
-      } catch (err) {
-        console.error('Error inesperado:', err);
-        alert('Error: Ocurrió un error al eliminar la rutina');
-      }
-    } else {
-      Alert.alert(
-        "Eliminar rutina",
-        "¿Estás seguro de que deseas eliminar esta rutina?",
-        [
-          { 
-            text: "Cancelar", 
-            style: "cancel"
-          },
-          {
-            text: "Eliminar",
-            style: "destructive",
-            onPress: async () => {
-              try {
-                const { error } = await supabase
-                  .from('routines')
-                  .delete()
-                  .eq('routine_id', id);
-
-                if (error) {
-                  console.error('Error eliminando rutina:', error);
-                  Alert.alert('Error', 'No se pudo eliminar la rutina');
-                  return;
-                }
-
-                Alert.alert(
-                  'Éxito', 
-                  'La rutina se eliminó correctamente',
-                  [
-                    {
-                      text: 'OK',
-                      onPress: () => router.back()
-                    }
-                  ]
-                );
-              } catch (err) {
-                console.error('Error inesperado:', err);
-                Alert.alert('Error', 'Ocurrió un error al eliminar la rutina');
-              }
-            }
-          }
-        ]
-      );
-    }
+  const handleDelete = () => {
+    deleteRoutine({
+      routineId: id as string,
+      onSuccess: () => router.back()
+    });
   };
 
   if (loading) {
