@@ -29,6 +29,8 @@ interface RoutineDetail {
   name: string;
   description: string;
   estimated_time: number;
+  created_at: string;
+  is_shared: boolean;
   routine_exercises: RoutineExercise[];
 }
 
@@ -51,7 +53,9 @@ export default function RoutineDetailScreen() {
           routine_id,
           name,
           description,
+          created_at,
           estimated_time,
+          is_shared,
           routine_exercises (
             routine_exercise_id,
             order,
@@ -100,7 +104,8 @@ export default function RoutineDetailScreen() {
       "En desarrollo",
       "La función de editar aún no está implementada"
     );
-    // TODO: router.push(`/edit-routine/${id}`);
+    // @ts-ignore
+    router.push(`/edit-routine/${id}`);
   };
 
   // TODO: Considerar implementar el patrón Strategy acá
@@ -142,6 +147,27 @@ export default function RoutineDetailScreen() {
         <Text style={styles.sectionTitle}>Descripción</Text>
         <Text style={styles.description}>
           {routine.description || "Sin descripción"}
+        </Text>
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Fecha de creación</Text>
+        <Text style={styles.creationDate}>
+          {routine.created_at 
+            ? new Date(routine.created_at).toLocaleString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+              })
+            : "Sin fecha registrada"}
+        </Text>
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Es compartida?</Text>
+        <Text style={styles.isShared}>
+          {routine.is_shared ? "Sí" : "No"}
         </Text>
       </View>
       <View style={styles.section}>
@@ -206,6 +232,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   description: {
+    color: theme.colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  creationDate: {
+    color: theme.colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  isShared: {
     color: theme.colors.textSecondary,
     fontSize: 16,
     lineHeight: 24,
