@@ -15,6 +15,9 @@ export default function RoutinesLayout() {
           fontFamily: 'Roboto_500Medium',
         },
         headerShadowVisible: false,
+        contentStyle: {
+          backgroundColor: theme.colors.background,
+        },
       }}
     >
       <Stack.Screen 
