@@ -11,6 +11,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "../../../services/supabase";
 import { theme } from "../../../constants/theme";
 import CustomButton from "../../../components/CustomButton";
+import { deleteRoutine } from "../../../services/delete-routine";
 
 interface Exercise {
   exercise_id: number;
@@ -102,25 +103,12 @@ export default function RoutineDetailScreen() {
     // TODO: router.push(`/edit-routine/${id}`);
   };
 
+  // TODO: Considerar implementar el patrón Strategy acá
   const handleDelete = () => {
-    Alert.alert(
-      "Eliminar rutina",
-      "¿Estás seguro de que deseas eliminar esta rutina?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: async () => {
-            // TODO: Implementar lógica de eliminación
-            Alert.alert(
-              "En desarrollo",
-              "La función de eliminar aún no está implementada"
-            );
-          },
-        },
-      ]
-    );
+    deleteRoutine({
+      routineId: id as string,
+      onSuccess: () => router.back()
+    });
   };
 
   if (loading) {
