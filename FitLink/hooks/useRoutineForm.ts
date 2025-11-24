@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '../services/supabase';
 
 interface Exercise {
@@ -18,6 +18,8 @@ interface UseRoutineFormProps {
 }
 
 export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
+  const initialDataRef = useRef(initialData);
+  
   const [name, setName] = useState(initialData?.name || '');
   const [description, setDescription] = useState(initialData?.description || '');
   const [estimatedTime, setEstimatedTime] = useState(initialData?.estimatedTime || '');
@@ -48,24 +50,26 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
 
   useEffect(() => {
     if (initialData) {
-      setName(initialData.name);
-      setDescription(initialData.description);
-      setEstimatedTime(initialData.estimatedTime);
-      setIsShared(initialData.isShared);
-      setSelectedExercises(initialData.selectedExercises);
-      setExerciseSets(initialData.exerciseSets);
+      if (!initialDataRef.current || 
+          JSON.stringify(initialDataRef.current) !== JSON.stringify(initialData)) {
+        initialDataRef.current = initialData;
+        setName(initialData.name);
+        setDescription(initialData.description);
+        setEstimatedTime(initialData.estimatedTime);
+        setIsShared(initialData.isShared);
+        setSelectedExercises(initialData.selectedExercises);
+        setExerciseSets(initialData.exerciseSets);
+      }
     }
   }, [initialData]);
 
-  const filteredExercises = exercises
-    .filter((ex) => ex.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    .sort((a, b) => {
-      const aSelected = selectedExercises.includes(a.exercise_id);
-      const bSelected = selectedExercises.includes(b.exercise_id);
-      if (aSelected && !bSelected) return -1;
-      if (!aSelected && bSelected) return 1;
-      return 0;
-    });
+  const availableExercises = exercises
+    .filter((ex) => !selectedExercises.includes(ex.exercise_id))
+    .filter((ex) => ex.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+  const selectedExercisesDetails = selectedExercises
+    .map(id => exercises.find(ex => ex.exercise_id === id))
+    .filter(ex => ex !== undefined) as Exercise[];
 
   const handleNameChange = (text: string) => {
     setName(text);
@@ -97,23 +101,22 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     }
   };
 
-  const toggleExerciseSelection = (exerciseId: number) => {
-    const isSelected = selectedExercises.includes(exerciseId);
-    
-    if (isSelected) {
-      setSelectedExercises(selectedExercises.filter(id => id !== exerciseId));
-      const newSets = { ...exerciseSets };
-      delete newSets[exerciseId];
-      setExerciseSets(newSets);
-    } else {
-      setSelectedExercises([...selectedExercises, exerciseId]);
-      if (errors.exercises) {
-        setErrors((prev) => {
-          const { exercises, ...rest } = prev;
-          return rest;
-        });
-      }
+  const addExercise = (exerciseId: number) => {
+    setSelectedExercises([...selectedExercises, exerciseId]);
+    setExerciseSets({ ...exerciseSets, [exerciseId]: '3' });
+    if (errors.exercises) {
+      setErrors((prev) => {
+        const { exercises, ...rest } = prev;
+        return rest;
+      });
     }
+  };
+
+  const removeExercise = (exerciseId: number) => {
+    setSelectedExercises(selectedExercises.filter(id => id !== exerciseId));
+    const newSets = { ...exerciseSets };
+    delete newSets[exerciseId];
+    setExerciseSets(newSets);
   };
 
   const handleSetsChange = (exerciseId: number, text: string) => {
@@ -161,15 +164,16 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
   });
 
   const hasChanges = () => {
-    if (!initialData) return true;
+    const initial = initialDataRef.current;
+    if (!initial) return true;
     
     return (
-      name !== initialData.name ||
-      description !== initialData.description ||
-      estimatedTime !== initialData.estimatedTime ||
-      isShared !== initialData.isShared ||
-      JSON.stringify(selectedExercises.sort()) !== JSON.stringify(initialData.selectedExercises.sort()) ||
-      JSON.stringify(exerciseSets) !== JSON.stringify(initialData.exerciseSets)
+      name !== initial.name ||
+      description !== initial.description ||
+      estimatedTime !== initial.estimatedTime ||
+      isShared !== initial.isShared ||
+      JSON.stringify(selectedExercises.sort()) !== JSON.stringify(initial.selectedExercises.sort()) ||
+      JSON.stringify(exerciseSets) !== JSON.stringify(initial.exerciseSets)
     );
   };
 
@@ -182,7 +186,8 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     exerciseSets,
     searchQuery,
     errors,
-    filteredExercises,
+    availableExercises,
+    selectedExercisesDetails,
     
     setIsShared,
     setSearchQuery,
@@ -190,7 +195,8 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     handleNameChange,
     handleDescriptionChange,
     handleEstimatedTimeChange,
-    toggleExerciseSelection,
+    addExercise,
+    removeExercise,
     handleSetsChange,
     
     validate,
