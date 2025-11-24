@@ -17,6 +17,13 @@ export default function RoutinesLayout() {
           title: "Detalle de Rutina"
         }}
       />
+      <Stack.Screen 
+        name="add-routine" 
+        options={{ 
+          headerShown: false,
+          title: "Nueva Rutina"
+        }}
+      />
     </Stack>
   );
 }

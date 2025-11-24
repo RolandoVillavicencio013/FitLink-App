@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import { View, TextInput, Switch, StyleSheet, Text, FlatList,
   KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../services/supabase';
-import TabLayout from './_layout';
-import CustomButton from '@/components/CustomButton';
-import { theme } from '@/constants/theme';
+import { supabase } from '../../../services/supabase';
+import CustomButton from '../../../components/CustomButton';
+import { theme } from '../../../constants/theme';
 import { Pressable } from 'react-native';
 
 interface exercise{
@@ -277,7 +276,6 @@ export default function AddRoutineScreen() {
         </View>
 
         <CustomButton label="Guardar rutina" onPress={() => handleAddRoutine()} />
-        <TabLayout/>
       </ScrollView>
     </KeyboardAvoidingView>
   );
