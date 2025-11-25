@@ -7,11 +7,12 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
 import { supabase } from "../../../services/supabase";
 import { theme } from "../../../constants/theme";
 import CustomButton from "../../../components/CustomButton";
 import { deleteRoutine } from "../../../services/delete-routine";
+import { useCallback } from "react";
 
 interface Exercise {
   exercise_id: number;
@@ -29,6 +30,8 @@ interface RoutineDetail {
   name: string;
   description: string;
   estimated_time: number;
+  created_at: string;
+  is_shared: boolean;
   routine_exercises: RoutineExercise[];
 }
 
@@ -38,9 +41,11 @@ export default function RoutineDetailScreen() {
   const [routine, setRoutine] = useState<RoutineDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) loadRoutineDetail();
-  }, [id]);
+  useFocusEffect(
+    useCallback(() => {
+      if (id) loadRoutineDetail();
+    }, [id])
+  );
 
   async function loadRoutineDetail() {
     try {
@@ -51,7 +56,9 @@ export default function RoutineDetailScreen() {
           routine_id,
           name,
           description,
+          created_at,
           estimated_time,
+          is_shared,
           routine_exercises (
             routine_exercise_id,
             order,
@@ -93,17 +100,10 @@ export default function RoutineDetailScreen() {
     }
   }
 
-  const handleGoBack = () => router.back();
-
   const handleEdit = () => {
-    Alert.alert(
-      "En desarrollo",
-      "La función de editar aún no está implementada"
-    );
-    // TODO: router.push(`/edit-routine/${id}`);
+    router.push(`/(tabs)/routines/edit-routine/${id}`);
   };
 
-  // TODO: Considerar implementar el patrón Strategy acá
   const handleDelete = () => {
     deleteRoutine({
       routineId: id as string,
@@ -124,7 +124,6 @@ export default function RoutineDetailScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.errorText}>No se encontró la rutina</Text>
-        <CustomButton label="Volver" onPress={handleGoBack} />
       </View>
     );
   }
@@ -142,6 +141,27 @@ export default function RoutineDetailScreen() {
         <Text style={styles.sectionTitle}>Descripción</Text>
         <Text style={styles.description}>
           {routine.description || "Sin descripción"}
+        </Text>
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Fecha de creación</Text>
+        <Text style={styles.creationDate}>
+          {routine.created_at 
+            ? new Date(routine.created_at).toLocaleString('es-ES', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit',
+                hour12: true
+              })
+            : "Sin fecha registrada"}
+        </Text>
+      </View>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Es compartida?</Text>
+        <Text style={styles.isShared}>
+          {routine.is_shared ? "Sí" : "No"}
         </Text>
       </View>
       <View style={styles.section}>
@@ -180,7 +200,6 @@ export default function RoutineDetailScreen() {
       <View style={styles.buttonsContainer}>
         <CustomButton label="Editar rutina" onPress={handleEdit} />
         <CustomButton label="Eliminar rutina" onPress={handleDelete} />
-        <CustomButton label="Volver al listado" onPress={handleGoBack} />
       </View>
     </ScrollView>
   );
@@ -206,6 +225,16 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   description: {
+    color: theme.colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  creationDate: {
+    color: theme.colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 24,
+  },
+  isShared: {
     color: theme.colors.textSecondary,
     fontSize: 16,
     lineHeight: 24,
