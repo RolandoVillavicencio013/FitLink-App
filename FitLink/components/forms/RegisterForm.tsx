@@ -2,7 +2,6 @@ import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Input, Button } from '../ui';
 import { theme } from '../../constants/theme';
-import * as validation from '../../utils/validations';
 
 interface RegisterFormProps {
   fullName: string;
@@ -45,7 +44,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
       
       <Input
         placeholder="Nombre completo"
-        rules={[validation.required('El nombre completo es obligatorio')]}
         value={fullName}
         onChange={onFullNameChange}
         error={fullNameError}
@@ -53,7 +51,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <Input
         placeholder="Correo electrónico"
-        rules={[validation.required('El correo electrónico es obligatorio'), validation.email()]}
         value={email}
         onChange={onEmailChange}
         error={emailError}
@@ -63,7 +60,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <Input
         placeholder="Nombre de usuario"
-        rules={[validation.required('El nombre de usuario es obligatorio')]}
         value={username}
         onChange={onUsernameChange}
         error={usernameError}
@@ -71,7 +67,6 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <Input
         placeholder="Contraseña"
-        rules={[validation.required('La contraseña es obligatoria'), validation.minLength(6, 'La contraseña debe tener al menos 6 caracteres')]}
         value={password}
         onChange={onPasswordChange}
         error={passwordError}

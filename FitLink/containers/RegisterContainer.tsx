@@ -38,10 +38,25 @@ export const useRegisterContainer = () => {
   const validate = (): boolean => {
     const newErrors: RegisterFormErrors = {};
 
-    if (!formData.fullName.trim()) newErrors.fullName = 'El nombre completo es obligatorio';
-    if (!formData.email.trim()) newErrors.email = 'El correo electrónico es obligatorio';
-    if (!formData.username.trim()) newErrors.username = 'El nombre de usuario es obligatorio';
-    if (!formData.password.trim()) newErrors.password = 'La contraseña es obligatoria';
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = 'El nombre completo es obligatorio';
+    }
+    
+    if (!formData.email.trim()) {
+      newErrors.email = 'El correo electrónico es obligatorio';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'El formato del correo electrónico no es válido';
+    }
+    
+    if (!formData.username.trim()) {
+      newErrors.username = 'El nombre de usuario es obligatorio';
+    }
+    
+    if (!formData.password.trim()) {
+      newErrors.password = 'La contraseña es obligatoria';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -61,7 +76,9 @@ export const useRegisterContainer = () => {
       router.replace('/login');
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error desconocido';
-      setErrors({ email: 'Error en registro: ' + message });
+      console.error('Error en registro:', message);
+      // No mostrar el error del servidor en el formulario
+      // El usuario verá los errores de validación solamente
     } finally {
       setLoading(false);
     }
