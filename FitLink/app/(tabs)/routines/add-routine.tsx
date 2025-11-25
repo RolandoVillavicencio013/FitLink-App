@@ -1,70 +1,76 @@
 import { useRouter } from 'expo-router';
-import { supabase } from '../../../services/supabase';
+import { Alert, Platform } from 'react-native';
 import RoutineForm from '../../../components/RoutineForm';
 import { useRoutineForm } from '../../../hooks/useRoutineForm';
+import { useAuth } from '../../../hooks/useAuth';
+import { createRoutine } from '../../../services/repositories/routineRepository';
+import { insertRoutineExercises } from '../../../services/repositories/exerciseRepository';
 
 export default function AddRoutineScreen() {
   const router = useRouter();
+  const { userId } = useAuth();
   const formState = useRoutineForm();
 
   async function handleAddRoutine() {
     if (!formState.validate()) return;
 
+    if (!userId) {
+      if (Platform.OS === 'web') {
+        window.alert('Usuario no autenticado');
+      } else {
+        Alert.alert('Error', 'Usuario no autenticado');
+      }
+      return;
+    }
+
     const formData = formState.getFormData();
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    try {
+      const { routine, error: routineError } = await createRoutine(userId, {
+        name: formData.name,
+        description: formData.description,
+        estimated_time: formData.estimatedTime,
+        is_shared: formData.isShared,
+      });
 
-    const { data: current_user, error: current_user_error } = await supabase
-      .from("users")
-      .select("user_id")
-      .eq("auth_id", user.id)
-      .single();
+      if (routineError || !routine) {
+        console.error(routineError);
+        if (Platform.OS === 'web') {
+          window.alert('Error al crear la rutina');
+        } else {
+          Alert.alert('Error', 'No se pudo crear la rutina');
+        }
+        return;
+      }
 
-    if (current_user_error || !current_user) {
-      console.error(current_user_error);
-      return;
-    }
+      const exercises = formData.selectedExercises.map((exerciseId) => ({
+        exercise_id: exerciseId,
+        sets: formData.exerciseSets[exerciseId],
+      }));
 
-    const { data: routineData, error } = await supabase
-      .from('routines')
-      .insert([
-        {
-          name: formData.name,
-          description: formData.description,
-          estimated_time: formData.estimatedTime,
-          user_id: current_user.user_id,
-          is_shared: formData.isShared,
-        },
-      ])
-      .select('routine_id')
-      .single();
+      const { error: exercisesError } = await insertRoutineExercises(
+        routine.routine_id,
+        exercises
+      );
 
-    if (error) {
-      console.error(error);
-      return;
-    }
+      if (exercisesError) {
+        console.error(exercisesError);
+        if (Platform.OS === 'web') {
+          window.alert('Error al agregar ejercicios');
+        } else {
+          Alert.alert('Error', 'No se pudieron agregar los ejercicios');
+        }
+        return;
+      }
 
-    if (!routineData) {
-      console.error("No se devolvió routineData");
-      return;
-    }
-
-    const routineId = routineData.routine_id;
-    const routineExercises = formData.selectedExercises.map((exerciseId) => ({
-      routine_id: routineId,
-      exercise_id: exerciseId,
-      sets: formData.exerciseSets[exerciseId],
-    }));
-
-    const { error: routineExercisesError } = await supabase
-      .from('routine_exercises')
-      .insert(routineExercises);
-
-    if (routineExercisesError) {
-      console.error(routineExercisesError);
-    } else {
       router.replace("/(tabs)/routines");
+    } catch (err) {
+      console.error(err);
+      if (Platform.OS === 'web') {
+        window.alert('Error inesperado');
+      } else {
+        Alert.alert('Error', 'Ocurrió un error inesperado');
+      }
     }
   }
 
