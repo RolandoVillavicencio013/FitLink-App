@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { supabase } from '../services/supabase';
+import { getAllExercises } from '../services/repositories/exerciseRepository';
 
 interface Exercise {
   exercise_id: number;
@@ -37,9 +37,7 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
 
   useEffect(() => {
     async function loadExercises() {
-      const { data, error } = await supabase
-        .from('exercises')
-        .select('exercise_id, name');
+      const { exercises: data, error } = await getAllExercises();
 
       if (!error && data) {
         setExercises(data);

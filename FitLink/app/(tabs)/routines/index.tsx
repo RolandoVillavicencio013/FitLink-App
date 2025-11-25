@@ -1,11 +1,12 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
-import { supabase } from '../../../services/supabase';
 import { theme } from '../../../constants/theme';
 import CustomButton from '../../../components/CustomButton';
 import { Pressable } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
+import { useAuth } from '../../../hooks/useAuth';
+import { useRoutines } from '../../../hooks/useRoutines';
 
 
 // Para arrays, especificar el tipo de elementos que contiene
@@ -13,21 +14,10 @@ interface RoutineExercisePreview {
   exercise_id: number;
 }
 
-interface routine{
-  routine_id: number;
-  name: string;
-  description: string;
-  is_shared: boolean;
-  created_at: string;
-  user_id: string;
-  estimated_time: number;
-  routine_exercises: RoutineExercisePreview[];
-}
-
 export default function RoutinesScreen() {
   const router = useRouter();
-  const [routines, setRoutines] = useState<routine[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { userId, loading: authLoading } = useAuth();
+  const { routines, loading: routinesLoading, refresh } = useRoutines(userId);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredRoutines = routines.filter((routine) =>
@@ -36,59 +26,14 @@ export default function RoutinesScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      loadRoutines();
-    }, [])
+      refresh();
+    }, [userId])
   );
 
-  async function loadRoutines() {
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-
-    if (userError || !user) {
-      setLoading(false);
-      return;
-    }
-
-    const { data: users, error: usersError } = await supabase
-      .from("users")
-      .select("user_id")
-      .eq("auth_id", user.id)
-      .single();
-
-    if (usersError || !users) {
-      setLoading(false);
-      return;
-    }
-
-    const { data, error } = await supabase
-    .from('routines')
-    .select(`
-      routine_id,
-      name,
-      description,
-      is_shared,
-      created_at,
-      user_id,
-      estimated_time,
-      routine_exercises (
-        exercise_id
-      )
-    `)
-    .eq('user_id', users.user_id)
-    .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error(error);
-    } else {
-      setRoutines(data);
-    }
-
-    setLoading(false);
-  }
-
-  if (loading) {
+  if (authLoading || routinesLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -101,16 +46,14 @@ export default function RoutinesScreen() {
         renderItem={({ item }) => (
           <Pressable
             style={styles.card}
-            onPress={() => {
-              router.push(`/(tabs)/routines/${item.routine_id}`);
-            }}
+            onPress={() => router.push(`/(tabs)/routines/${item.routine_id}`)}
           >
             <Text style={styles.title}>{item.name}</Text>
             <Text style={styles.exercises}>
-              {'Cantidad de ejercicios: ' + (item.routine_exercises?.length ?? 0)}
+              Cantidad de ejercicios: {item.routine_exercises?.length ?? 0}
             </Text>
             <Text style={styles.time}>
-              {'Tiempo estimado: ' + item.estimated_time + ' minutos'}
+              Tiempo estimado: {item.estimated_time} minutos
             </Text>
           </Pressable>
         )}
