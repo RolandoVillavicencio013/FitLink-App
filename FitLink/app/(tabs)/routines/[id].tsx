@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,11 +8,10 @@ import {
   StyleSheet,
 } from "react-native";
 import { useLocalSearchParams, useRouter, useFocusEffect } from "expo-router";
-import { supabase } from "../../../services/supabase";
 import { theme } from "../../../constants/theme";
 import CustomButton from "../../../components/CustomButton";
 import { deleteRoutine } from "../../../services/delete-routine";
-import { useCallback } from "react";
+import { getRoutineById } from "../../../services/repositories/routineRepository";
 
 interface Exercise {
   exercise_id: number;
@@ -50,41 +49,30 @@ export default function RoutineDetailScreen() {
   async function loadRoutineDetail() {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from("routines")
-        .select(`
-          routine_id,
-          name,
-          description,
-          created_at,
-          estimated_time,
-          is_shared,
-          routine_exercises (
-            routine_exercise_id,
-            order,
-            sets,
-            exercises (
-              exercise_id,
-              name,
-              description
-            )
-          )
-        `)
-        .eq("routine_id", id)
-        .single();
-      if (error) {
+      
+      if (!id) {
+        Alert.alert("Error", "ID de rutina no válido");
+        router.back();
+        return;
+      }
+
+      const { routine, error } = await getRoutineById(id);
+      
+      if (error || !routine) {
         Alert.alert("Error", "No se pudo cargar la rutina");
         router.back();
         return;
       }
+      
       // Ordenamos por 'order'
-      if (data.routine_exercises) {
-        data.routine_exercises.sort((a, b) => a.order - b.order);
+      if (routine.routine_exercises) {
+        routine.routine_exercises.sort((a: any, b: any) => a.order - b.order);
       }
+      
       const processedData: RoutineDetail = {
-        ...data,
+        ...routine,
         routine_exercises:
-          data.routine_exercises?.map((re: any) => ({
+          routine.routine_exercises?.map((re: any) => ({
             routine_exercise_id: re.routine_exercise_id,
             order: re.order,
             sets: re.sets,
