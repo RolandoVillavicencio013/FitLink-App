@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '../../../constants/theme';

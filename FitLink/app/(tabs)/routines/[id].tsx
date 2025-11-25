@@ -34,6 +34,13 @@ interface RoutineDetail {
   routine_exercises: RoutineExercise[];
 }
 
+interface RawRoutineExercise {
+  routine_exercise_id: number;
+  order: number;
+  sets: number;
+  exercises: Exercise;
+}
+
 export default function RoutineDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
@@ -66,13 +73,13 @@ export default function RoutineDetailScreen() {
       
       // Ordenamos por 'order'
       if (routine.routine_exercises) {
-        routine.routine_exercises.sort((a: any, b: any) => a.order - b.order);
+        (routine.routine_exercises as unknown as RawRoutineExercise[]).sort((a, b) => a.order - b.order);
       }
-      
+
       const processedData: RoutineDetail = {
         ...routine,
         routine_exercises:
-          routine.routine_exercises?.map((re: any) => ({
+          (routine.routine_exercises as unknown as RawRoutineExercise[])?.map((re) => ({
             routine_exercise_id: re.routine_exercise_id,
             order: re.order,
             sets: re.sets,
@@ -80,7 +87,7 @@ export default function RoutineDetailScreen() {
           })) || [],
       };
       setRoutine(processedData);
-    } catch (err) {
+    } catch {
       Alert.alert("Error", "Ocurrió un error inesperado");
       router.back();
     } finally {
@@ -194,39 +201,32 @@ export default function RoutineDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
-  contentContainer: { padding: 20 },
+  buttonsContainer: { gap: 12, marginTop: 20, paddingBottom: 20 },
   center: {
+    alignItems: "center",
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
     padding: 20,
   },
-  header: { marginBottom: 20 },
-  title: { fontSize: 28, fontWeight: "bold", color: theme.colors.textPrimary },
-  time: { color: theme.colors.textSecondary, fontSize: 16, marginTop: 5 },
-  section: { marginBottom: 25 },
-  sectionTitle: {
-    color: theme.colors.textPrimary,
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
+  container: { backgroundColor: theme.colors.background, flex: 1 },
+  contentContainer: { padding: 20 },
+  creationDate: {
+    color: theme.colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 24,
   },
   description: {
     color: theme.colors.textSecondary,
     fontSize: 16,
     lineHeight: 24,
   },
-  creationDate: {
+  detailText: { color: theme.colors.textSecondary, fontSize: 14 },
+  emptyText: {
     color: theme.colors.textSecondary,
-    fontSize: 16,
-    lineHeight: 24,
+    fontStyle: "italic",
+    textAlign: "center",
   },
-  isShared: {
-    color: theme.colors.textSecondary,
-    fontSize: 16,
-    lineHeight: 24,
-  },
+  errorText: { color: theme.colors.error, fontSize: 18, marginBottom: 20 },
   exerciseCard: {
     backgroundColor: theme.colors.surface,
     borderLeftColor: theme.colors.primary,
@@ -234,25 +234,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     padding: 15,
-  },
-  exerciseHeader: { flexDirection: "row", gap: 12 },
-  exerciseNumber: {
-    alignSelf: "flex-start",
-    backgroundColor: theme.colors.primary,
-    borderRadius: 15,
-    color: theme.colors.textPrimary,
-    fontSize: 14,
-    fontWeight: "bold",
-    height: 30,
-    lineHeight: 30,
-    minWidth: 30,
-    textAlign: "center",
-  },
-  exerciseInfo: { flex: 1 },
-  exerciseName: {
-    color: theme.colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "600",
   },
   exerciseDescription: {
     color: theme.colors.textSecondary,
@@ -265,13 +246,39 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 10,
   },
-  detailText: { color: theme.colors.textSecondary, fontSize: 14 },
-  emptyText: {
-    color: theme.colors.textSecondary,
-    fontStyle: "italic",
+  exerciseHeader: { flexDirection: "row", gap: 12 },
+  exerciseInfo: { flex: 1 },
+  exerciseName: {
+    color: theme.colors.textPrimary,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  exerciseNumber: {
+    alignSelf: "flex-start",
+    backgroundColor: theme.colors.primary,
+    borderRadius: 15,
+    color: theme.colors.textPrimary,
+    fontSize: 14,
+    fontWeight: "bold",
+    height: 30,
+    lineHeight: 30,
+    minWidth: 30,
     textAlign: "center",
   },
-  errorText: { color: theme.colors.error, fontSize: 18, marginBottom: 20 },
+  header: { marginBottom: 20 },
+  isShared: {
+    color: theme.colors.textSecondary,
+    fontSize: 16,
+    lineHeight: 24,
+  },
   loadingText: { color: theme.colors.textSecondary, marginTop: 10 },
-  buttonsContainer: { gap: 12, marginTop: 20, paddingBottom: 20 },
+  section: { marginBottom: 25 },
+  sectionTitle: {
+    color: theme.colors.textPrimary,
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 12,
+  },
+  time: { color: theme.colors.textSecondary, fontSize: 16, marginTop: 5 },
+  title: { color: theme.colors.textPrimary, fontSize: 28, fontWeight: "bold" },
 });

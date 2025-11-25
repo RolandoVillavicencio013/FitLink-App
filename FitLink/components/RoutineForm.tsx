@@ -1,4 +1,4 @@
-import { View, TextInput, Switch, StyleSheet, Text, FlatList,
+import { View, TextInput, Switch, StyleSheet, Text,
   KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
 import CustomButton from './CustomButton';
 import { theme } from '../constants/theme';
@@ -174,88 +174,18 @@ export default function RoutineForm({
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flexGrow: 1, 
-    padding: 20, 
-    paddingBottom: 40,
-    paddingTop: 10 
-  },
-  description: { minHeight: 120 },
-  errorText: {
-    color: theme.colors.error,
-    fontFamily: "Roboto_400Regular",
-    fontSize: 14,
-    marginBottom: 8,
-    marginLeft: 5,
-    marginTop: 5
-  },
-  emptyText: {
-    color: theme.colors.textSecondary,
-    fontFamily: "Roboto_400Regular",
-    fontSize: 14,
-    fontStyle: 'italic',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
-  selectedExercisesContainer: {
-    marginBottom: 15,
-  },
-  selectedExerciseItem: {
+  addButton: {
     alignItems: 'center',
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.primary,
-    borderLeftWidth: 4,
-    borderRadius: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-    padding: 12,
-  },
-  selectedExerciseInfo: {
-    alignItems: 'center',
-    flex: 1,
-    flexDirection: 'row',
-    gap: 10,
-  },
-  exerciseNumber: {
-    alignSelf: 'center',
     backgroundColor: theme.colors.primary,
-    borderRadius: 12,
-    color: theme.colors.textPrimary,
-    fontSize: 12,
-    fontWeight: 'bold',
-    height: 24,
-    lineHeight: 24,
-    minWidth: 24,
-    textAlign: 'center',
-  },
-  selectedExerciseName: {
-    color: theme.colors.textPrimary,
-    flex: 1,
-    fontFamily: "Roboto_400Regular",
-    fontSize: 16,
-  },
-  removeButton: {
-    alignItems: 'center',
-    backgroundColor: theme.colors.error,
     borderRadius: 15,
     height: 30,
     justifyContent: 'center',
     width: 30,
   },
-  removeButtonText: {
+  addButtonText: {
     color: theme.colors.textPrimary,
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-  },
-  availableExercisesContainer: {
-    backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.divider,
-    borderRadius: 8,
-    borderWidth: 1,
-    marginBottom: 20,
-    maxHeight: 250,
-    padding: 10,
   },
   availableExerciseItem: {
     alignItems: 'center',
@@ -271,18 +201,49 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
   },
-  addButton: {
-    alignItems: 'center',
-    backgroundColor: theme.colors.primary,
-    borderRadius: 15,
-    height: 30,
-    justifyContent: 'center',
-    width: 30,
+  availableExercisesContainer: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.divider,
+    borderRadius: 8,
+    borderWidth: 1,
+    marginBottom: 20,
+    maxHeight: 250,
+    padding: 10,
   },
-  addButtonText: {
+  container: { 
+    flexGrow: 1, 
+    padding: 20, 
+    paddingBottom: 40,
+    paddingTop: 10 
+  },
+  description: { minHeight: 120 },
+  emptyText: {
+    color: theme.colors.textSecondary,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  errorText: {
+    color: theme.colors.error,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 14,
+    marginBottom: 8,
+    marginLeft: 5,
+    marginTop: 5
+  },
+  exerciseNumber: {
+    alignSelf: 'center',
+    backgroundColor: theme.colors.primary,
+    borderRadius: 12,
     color: theme.colors.textPrimary,
-    fontSize: 20,
+    fontSize: 12,
     fontWeight: 'bold',
+    height: 24,
+    lineHeight: 24,
+    minWidth: 24,
+    textAlign: 'center',
   },
   input: {
     borderColor: theme.colors.border,
@@ -304,6 +265,19 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingLeft: 3,
   },
+  removeButton: {
+    alignItems: 'center',
+    backgroundColor: theme.colors.error,
+    borderRadius: 15,
+    height: 30,
+    justifyContent: 'center',
+    width: 30,
+  },
+  removeButtonText: {
+    color: theme.colors.textPrimary,
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
   row: {
     flexDirection: 'row',
     marginBottom: 10,
@@ -319,6 +293,32 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     padding: 10,
     width: '100%',
+  },
+  selectedExerciseInfo: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 10,
+  },
+  selectedExerciseItem: {
+    alignItems: 'center',
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.primary,
+    borderLeftWidth: 4,
+    borderRadius: 8,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    padding: 12,
+  },
+  selectedExerciseName: {
+    color: theme.colors.textPrimary,
+    flex: 1,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16,
+  },
+  selectedExercisesContainer: {
+    marginBottom: 15,
   },
   setsInput: {
     borderColor: theme.colors.borderSecondary,

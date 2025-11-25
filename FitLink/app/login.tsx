@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { Button, StyleSheet, Text, TextInput, View, Alert } from "react-native";
+import { Button, StyleSheet, Text, TextInput, View } from "react-native";
 import { theme } from "../constants/theme";
 import { loginUser } from "../services/authService";
 
@@ -29,10 +29,10 @@ const Login: React.FC = () => {
         return;
       }
 
-      const user = await loginUser(email, password);
+      await loginUser(email, password);
       router.replace("/(tabs)/home");
-    } catch (err: any) {
-        if (err.message.includes("Invalid login credentials")) {
+    } catch (err: unknown) {
+        if (err instanceof Error && err.message.includes("Invalid login credentials")) {
           alert("Credenciales inválidas");
         } else {
           alert("Error en login");
@@ -84,25 +84,25 @@ export default Login;
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: theme.colors.background,
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 20,
-    backgroundColor: theme.colors.background,
+  },
+  input: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.divider,
+    borderRadius: 8,
+    borderWidth: 1,
+    color: theme.colors.textPrimary,
+    marginBottom: 20,
+    padding: 12,
   },
   title: {
+    color: theme.colors.textPrimary,
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    color: theme.colors.textPrimary,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: theme.colors.divider,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 20,
-    backgroundColor: theme.colors.surface,
-    color: theme.colors.textPrimary,
   },
 });

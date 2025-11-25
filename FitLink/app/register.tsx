@@ -32,8 +32,9 @@ const Register: React.FC = () => {
     try {
       await registerUser(email, password, username, fullName);
       router.replace("/login");
-    } catch (err: any) {
-      alert("Error en registro: " + err.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Error desconocido';
+      alert("Error en registro: " + message);
     }
   };
 
@@ -91,25 +92,25 @@ export default Register;
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: theme.colors.background,
     flex: 1,
     justifyContent: "center",
     paddingHorizontal: 20,
-    backgroundColor: theme.colors.background,
+  },
+  input: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.divider,
+    borderRadius: 8,
+    borderWidth: 1,
+    color: theme.colors.textPrimary,
+    marginBottom: 20,
+    padding: 12,
   },
   title: {
+    color: theme.colors.textPrimary,
     fontSize: 22,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    color: theme.colors.textPrimary,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: theme.colors.divider,
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 20,
-    backgroundColor: theme.colors.surface,
-    color: theme.colors.textPrimary,
   },
 });

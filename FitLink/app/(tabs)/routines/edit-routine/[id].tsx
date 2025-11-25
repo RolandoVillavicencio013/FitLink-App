@@ -7,13 +7,26 @@ import { theme } from '../../../../constants/theme';
 import { getRoutineById, updateRoutine } from '../../../../services/repositories/routineRepository';
 import { deleteRoutineExercises, insertRoutineExercises } from '../../../../services/repositories/exerciseRepository';
 
+interface Exercise {
+  exercise_id: number;
+  name: string;
+  description: string | null;
+}
+
+interface RawRoutineExercise {
+  routine_exercise_id: number;
+  order: number;
+  sets: number;
+  exercises: Exercise;
+}
+
 export default function EditRoutineScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const navigation = useNavigation();
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  
+
   const [initialData, setInitialData] = useState({
     name: '',
     description: '',
@@ -60,7 +73,7 @@ export default function EditRoutineScreen() {
   async function loadRoutineData() {
     try {
       setLoading(true);
-      
+
       if (!id) {
         Alert.alert('Error', 'ID de rutina no válido');
         router.back();
@@ -80,13 +93,13 @@ export default function EditRoutineScreen() {
         description: routine.description,
         estimatedTime: routine.estimated_time.toString(),
         isShared: routine.is_shared,
-        selectedExercises: routine.routine_exercises.map((re: any) => re.exercises.exercise_id),
+        selectedExercises: (routine.routine_exercises as unknown as RawRoutineExercise[]).map((re) => re.exercises.exercise_id),
         exerciseSets: Object.fromEntries(
-          routine.routine_exercises.map((re: any) => [re.exercises.exercise_id, re.sets.toString()])
+          (routine.routine_exercises as unknown as RawRoutineExercise[]).map((re) => [re.exercises.exercise_id, re.sets.toString()])
         ),
       };
       setInitialData(loaded);
-    } catch (err) {
+    } catch {
       Alert.alert('Error', 'Ocurrió un error inesperado');
       router.back();
     } finally {
@@ -106,7 +119,7 @@ export default function EditRoutineScreen() {
 
     try {
       setIsSaving(true);
-      
+
       const { error: updateError } = await updateRoutine(id, {
         name: formData.name,
         description: formData.description,

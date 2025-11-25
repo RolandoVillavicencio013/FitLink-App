@@ -73,6 +73,7 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     setName(text);
     if (errors.name && text.trim()) {
       setErrors((prev) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { name, ...rest } = prev;
         return rest;
       });
@@ -83,6 +84,7 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     setDescription(text);
     if (errors.description && text.trim()) {
       setErrors((prev) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { description, ...rest } = prev;
         return rest;
       });
@@ -93,6 +95,7 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     setEstimatedTime(text);
     if (errors.estimatedTime && text.trim() && !isNaN(Number(text))) {
       setErrors((prev) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { estimatedTime, ...rest } = prev;
         return rest;
       });
@@ -104,6 +107,7 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     setExerciseSets({ ...exerciseSets, [exerciseId]: '3' });
     if (errors.exercises) {
       setErrors((prev) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { exercises, ...rest } = prev;
         return rest;
       });
@@ -121,6 +125,7 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     setExerciseSets({ ...exerciseSets, [exerciseId]: text });
     if (errors.sets && Number(text) > 0) {
       setErrors((prev) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { sets, ...rest } = prev;
         return rest;
       });
