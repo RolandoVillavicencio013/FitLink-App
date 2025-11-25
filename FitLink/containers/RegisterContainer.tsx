@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useRouter } from 'expo-router';
+import { Alert, Platform } from 'react-native';
 import { registerUser } from '../services/authService';
 
 interface RegisterFormData {
@@ -77,8 +78,12 @@ export const useRegisterContainer = () => {
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error desconocido';
       console.error('Error en registro:', message);
-      // No mostrar el error del servidor en el formulario
-      // El usuario verá los errores de validación solamente
+      
+      if (Platform.OS === 'web') {
+        window.alert('No se pudo completar el registro. Por favor verifica tus datos e intenta nuevamente.');
+      } else {
+        Alert.alert('Error', 'No se pudo completar el registro. Por favor verifica tus datos e intenta nuevamente.');
+      }
     } finally {
       setLoading(false);
     }
