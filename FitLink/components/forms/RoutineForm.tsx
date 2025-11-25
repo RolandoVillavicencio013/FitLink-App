@@ -1,7 +1,7 @@
 import { View, TextInput, Switch, StyleSheet, Text,
   KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
-import { Button } from './ui/Button';
-import { theme } from '../constants/theme';
+import { Button } from '../ui/Button';
+import { theme } from '../../constants/theme';
 
 interface Exercise {
   exercise_id: number;
@@ -19,6 +19,8 @@ interface RoutineFormProps {
   selectedExercisesDetails: Exercise[];
   selectedExercises: number[];
   exerciseSets: { [key: number]: string };
+  isLoading?: boolean;
+  submitLabel?: string;
   
   setIsShared: (value: boolean) => void;
   setSearchQuery: (value: string) => void;
@@ -28,9 +30,7 @@ interface RoutineFormProps {
   addExercise: (id: number) => void;
   removeExercise: (id: number) => void;
   handleSetsChange: (id: number, text: string) => void;
-  
-  onSubmit: () => void;
-  submitLabel: string;
+  handleSubmit: () => void;
 }
 
 export default function RoutineForm({
@@ -44,6 +44,8 @@ export default function RoutineForm({
   selectedExercisesDetails,
   selectedExercises,
   exerciseSets,
+  isLoading = false,
+  submitLabel = 'Guardar rutina',
   setIsShared,
   setSearchQuery,
   handleNameChange,
@@ -52,8 +54,7 @@ export default function RoutineForm({
   addExercise,
   removeExercise,
   handleSetsChange,
-  onSubmit,
-  submitLabel,
+  handleSubmit,
 }: RoutineFormProps) {
   return (
     <KeyboardAvoidingView
@@ -167,7 +168,11 @@ export default function RoutineForm({
           />
         </View>
 
-        <Button title={submitLabel} onPress={onSubmit} />
+        <Button 
+          title={submitLabel} 
+          onPress={handleSubmit}
+          disabled={isLoading}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );

@@ -5,18 +5,21 @@ import { theme } from '../constants/theme';
 interface CustomButtonProps {
   label: string;
   onPress: () => void;
+  disabled?: boolean;
 }
 
-export default function CustomButton({ label, onPress }: CustomButtonProps) {
+export default function CustomButton({ label, onPress, disabled = false }: CustomButtonProps) {
   return (
     <Pressable
       style={({ pressed }) => [
         styles.button,
-        pressed && styles.buttonPressed,
+        pressed && !disabled && styles.buttonPressed,
+        disabled && styles.buttonDisabled,
       ]}
-      onPress={onPress}
+      onPress={disabled ? undefined : onPress}
+      disabled={disabled}
     >
-      <Text style={styles.text}>{label}</Text>
+      <Text style={[styles.text, disabled && styles.textDisabled]}>{label}</Text>
     </Pressable>
   );
 }
@@ -33,6 +36,10 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     width: '100%',
   },
+  buttonDisabled: {
+    backgroundColor: theme.colors.border,
+    opacity: 0.5,
+  },
   buttonPressed: {
     backgroundColor: theme.colors.primaryHover,
   },
@@ -41,5 +48,8 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
     fontSize: 16.5,
     fontWeight: 500,
+  },
+  textDisabled: {
+    color: theme.colors.textSecondary,
   },
 });
