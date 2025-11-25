@@ -26,6 +26,7 @@ export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [shouldBlockNavigation, setShouldBlockNavigation] = useState(true);
 
   const [initialData, setInitialData] = useState({
     name: '',
@@ -128,6 +129,7 @@ export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps
         Alert.alert('Éxito', 'Rutina actualizada exitosamente');
       }
 
+      setShouldBlockNavigation(false);
       router.back();
     } catch (error) {
       setIsSaving(false);
@@ -145,5 +147,6 @@ export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps
     handleSubmit,
     isLoading,
     isSaving,
+    shouldBlockNavigation,
   };
 }

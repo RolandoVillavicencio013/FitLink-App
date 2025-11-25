@@ -10,6 +10,7 @@ export function useAddRoutineContainer() {
   const router = useRouter();
   const formState = useRoutineForm();
   const [isLoading, setIsLoading] = useState(false);
+  const [shouldBlockNavigation, setShouldBlockNavigation] = useState(true);
 
   async function handleSubmit() {
     if (!formState.validate()) return;
@@ -83,6 +84,7 @@ export function useAddRoutineContainer() {
         return;
       }
 
+      setShouldBlockNavigation(false);
       router.replace("/(tabs)/routines");
     } catch (err) {
       console.error(err);
@@ -100,5 +102,6 @@ export function useAddRoutineContainer() {
     ...formState,
     handleSubmit,
     isLoading,
+    shouldBlockNavigation,
   };
 }
