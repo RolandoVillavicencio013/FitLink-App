@@ -1,12 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator, FlatList, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { theme } from '../../../constants/theme';
 import CustomButton from '../../../components/CustomButton';
 import { Pressable } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { useAuth } from '../../../hooks/useAuth';
-import { useRoutines } from '../../../hooks/useRoutines';
+import { supabase } from '../../../services/supabase';
+import { getRoutinesByUserId } from '../../../services/repositories/routineRepository';
 
 
 // Para arrays, especificar el tipo de elementos que contiene
@@ -14,10 +14,21 @@ interface RoutineExercisePreview {
   exercise_id: number;
 }
 
+interface Routine {
+  routine_id: number;
+  name: string;
+  description: string;
+  is_shared: boolean;
+  created_at: string;
+  user_id: string;
+  estimated_time: number;
+  routine_exercises: RoutineExercisePreview[];
+}
+
 export default function RoutinesScreen() {
   const router = useRouter();
-  const { userId, loading: authLoading } = useAuth();
-  const { routines, loading: routinesLoading, refresh } = useRoutines(userId);
+  const [routines, setRoutines] = useState<Routine[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredRoutines = routines.filter((routine) =>
@@ -26,11 +37,46 @@ export default function RoutinesScreen() {
 
   useFocusEffect(
     useCallback(() => {
-      refresh();
-    }, [userId])
+      loadRoutines();
+    }, [])
   );
 
-  if (authLoading || routinesLoading) {
+  async function loadRoutines() {
+    try {
+      setLoading(true);
+      
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        setLoading(false);
+        return;
+      }
+
+      const { data: users, error: usersError } = await supabase
+        .from("users")
+        .select("user_id")
+        .eq("auth_id", user.id)
+        .single();
+
+      if (usersError || !users) {
+        setLoading(false);
+        return;
+      }
+
+      const { routines: data, error } = await getRoutinesByUserId(users.user_id);
+
+      if (error) {
+        console.error(error);
+      } else {
+        setRoutines(data || []);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (loading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color={theme.colors.primary} />

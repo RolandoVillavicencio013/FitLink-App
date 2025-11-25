@@ -8,7 +8,6 @@ import {
   Roboto_700Bold,
 } from "@expo-google-fonts/roboto";
 import { ActivityIndicator, View } from "react-native";
-import { AuthProvider } from '../contexts/AuthContext';
 
 const RootLayout: React.FC = () => {
   const [fontsLoaded] = useFonts({
@@ -30,21 +29,19 @@ const RootLayout: React.FC = () => {
 
 const RootLayoutNav: React.FC = () => {
   return (
-    <AuthProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: theme.colors.background }
-        }}
-      >
-        {/* Pantallas públicas */}
-        <Stack.Screen name="login" />
-        <Stack.Screen name="register" />
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        contentStyle: { backgroundColor: theme.colors.background }
+      }}
+    >
+      {/* Pantallas públicas */}
+      <Stack.Screen name="login" />
+      <Stack.Screen name="register" />
 
-        {/* Pantallas privadas dentro de tabs */}
-        <Stack.Screen name="(tabs)" />
-      </Stack>
-    </AuthProvider>
+      {/* Pantallas privadas dentro de tabs */}
+      <Stack.Screen name="(tabs)" />
+    </Stack>
   );
 };
 

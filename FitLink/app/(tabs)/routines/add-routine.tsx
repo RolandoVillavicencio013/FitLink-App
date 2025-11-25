@@ -2,31 +2,49 @@ import { useRouter } from 'expo-router';
 import { Alert, Platform } from 'react-native';
 import RoutineForm from '../../../components/RoutineForm';
 import { useRoutineForm } from '../../../hooks/useRoutineForm';
-import { useAuth } from '../../../hooks/useAuth';
+import { supabase } from '../../../services/supabase';
 import { createRoutine } from '../../../services/repositories/routineRepository';
 import { insertRoutineExercises } from '../../../services/repositories/exerciseRepository';
 
 export default function AddRoutineScreen() {
   const router = useRouter();
-  const { userId } = useAuth();
   const formState = useRoutineForm();
 
   async function handleAddRoutine() {
     if (!formState.validate()) return;
 
-    if (!userId) {
-      if (Platform.OS === 'web') {
-        window.alert('Usuario no autenticado');
-      } else {
-        Alert.alert('Error', 'Usuario no autenticado');
-      }
-      return;
-    }
-
     const formData = formState.getFormData();
 
     try {
-      const { routine, error: routineError } = await createRoutine(userId, {
+      // Obtener usuario actual
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        if (Platform.OS === 'web') {
+          window.alert('Usuario no autenticado');
+        } else {
+          Alert.alert('Error', 'Usuario no autenticado');
+        }
+        return;
+      }
+
+      // Obtener user_id de la tabla users
+      const { data: dbUser, error: dbUserError } = await supabase
+        .from("users")
+        .select("user_id")
+        .eq("auth_id", user.id)
+        .single();
+
+      if (dbUserError || !dbUser) {
+        console.error(dbUserError);
+        if (Platform.OS === 'web') {
+          window.alert('Error al obtener datos del usuario');
+        } else {
+          Alert.alert('Error', 'No se pudieron obtener tus datos');
+        }
+        return;
+      }
+
+      const { routine, error: routineError } = await createRoutine(dbUser.user_id, {
         name: formData.name,
         description: formData.description,
         estimated_time: formData.estimatedTime,
