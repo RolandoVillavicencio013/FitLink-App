@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, SafeAreaView } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLoginContainer } from '../../containers/LoginContainer';
 import { LoginForm } from '../forms/LoginForm';
 import { theme } from '../../constants/theme';
