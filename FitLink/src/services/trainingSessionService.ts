@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { FinalizedSet } from "@/components/views/TrainingSessionView";
+import { FinalizedSet } from "@/src/components/views/TrainingSessionView";
 
 export async function fetchRoutine(routineId: string) {
   return supabase

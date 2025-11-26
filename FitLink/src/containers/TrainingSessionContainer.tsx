@@ -5,8 +5,8 @@ import {
   TrainingSessionView,
   FinalizedSet,
   Routine,
-} from "@/components/views/TrainingSessionView";
-import { fetchRoutine, endSession } from "@/services/trainingSessionService";
+} from "@/src/components/views/TrainingSessionView";
+import { fetchRoutine, endSession } from "@/src/services/trainingSessionService";
 
 interface TrainingSessionContainerProps {
   routineId: string;

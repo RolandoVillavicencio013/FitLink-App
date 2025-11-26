@@ -1,4 +1,4 @@
-import { FinalizedSet, Routine } from "@/components/views/TrainingSessionView";
+import { FinalizedSet, Routine } from "@/src/components/views/TrainingSessionView";
 
 type SerieState = { weight?: string; reps?: string; done: boolean };
 
