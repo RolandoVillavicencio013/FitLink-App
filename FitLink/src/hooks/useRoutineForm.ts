@@ -168,7 +168,16 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
 
   const hasChanges = () => {
     const initial = initialDataRef.current;
-    if (!initial) return true;
+    
+    // Si no hay datos iniciales, verificar si el formulario tiene contenido
+    if (!initial) {
+      return (
+        name.trim() !== '' ||
+        description.trim() !== '' ||
+        estimatedTime.trim() !== '' ||
+        selectedExercises.length > 0
+      );
+    }
     
     return (
       name !== initial.name ||

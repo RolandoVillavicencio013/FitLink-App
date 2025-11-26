@@ -5,6 +5,11 @@ module.exports = {
     'node_modules/(?!(expo-modules-core|expo|react-native|@react-native|@expo|@unimodules)/)',
   ],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  setupFilesAfterEnv: ['@testing-library/jest-native/extend-expect'],
   testEnvironment: 'jsdom',
+  collectCoverageFrom: [
+    'src/**/*.{js,jsx,ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/**/*.test.{js,jsx,ts,tsx}',
+  ],
+  coverageDirectory: 'coverage',
 };

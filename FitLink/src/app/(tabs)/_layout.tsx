@@ -16,7 +16,7 @@ const TabLayout: React.FC = () => {
     <View style={{ flex: 1 }}>
       <Tabs
         screenOptions={{
-          headerShown: true,
+          headerShown: false,
           tabBarActiveTintColor: theme.colors.primary,
           tabBarStyle: {
             backgroundColor: theme.colors.surface,
