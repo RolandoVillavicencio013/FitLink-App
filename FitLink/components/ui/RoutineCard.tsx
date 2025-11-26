@@ -31,7 +31,7 @@ export const RoutineCard: FC<RoutineCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: theme.colors.surface,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.divider,
     borderRadius: 10,
     borderWidth: 2,
     marginBottom: 10,
