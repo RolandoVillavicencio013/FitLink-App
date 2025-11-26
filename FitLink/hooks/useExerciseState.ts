@@ -10,11 +10,11 @@ export function useExerciseState() {
   const serieStateGetter = (exerciseId: string | number, serieIndex: number) =>
     perExerciseState[exerciseId]?.[serieIndex] ?? { done: false };
 
-  const updateSerieField = (
+  const updateSerieField = <K extends keyof SerieState>(
     exerciseId: string | number,
     serieIndex: number,
-    field: keyof SerieState,
-    value: string | boolean
+    field: K,
+    value: SerieState[K]
   ) => {
     setPerExerciseState((prev) => ({
       ...prev,
@@ -22,7 +22,7 @@ export function useExerciseState() {
         ...(prev[exerciseId] ?? {}),
         [serieIndex]: {
           ...(prev[exerciseId]?.[serieIndex] ?? { done: false }),
-          [field]: value as any,
+          [field]: value,
         },
       },
     }));

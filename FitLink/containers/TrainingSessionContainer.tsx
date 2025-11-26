@@ -4,6 +4,7 @@ import { theme } from "../constants/theme";
 import {
   TrainingSessionView,
   FinalizedSet,
+  Routine,
 } from "@/components/views/TrainingSessionView";
 import { fetchRoutine, endSession } from "@/services/trainingSessionService";
 
@@ -14,14 +15,14 @@ interface TrainingSessionContainerProps {
 export default function TrainingSessionContainer({
   routineId,
 }: TrainingSessionContainerProps) {
-  const [routine, setRoutine] = useState<any>(null);
+  const [routine, setRoutine] = useState<Routine | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadRoutine = async () => {
       setLoading(true);
       const { data, error } = await fetchRoutine(routineId);
-      if (!error) setRoutine(data);
+      if (!error) setRoutine(data as Routine);
       setLoading(false);
     };
     loadRoutine();
@@ -30,7 +31,7 @@ export default function TrainingSessionContainer({
   const handleEndSession = (payload: FinalizedSet[], duration: number) =>
     endSession(routineId, payload, duration);
 
-  if (loading) {
+  if (loading || !routine) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color={theme.colors.primary} />

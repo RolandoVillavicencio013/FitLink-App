@@ -24,14 +24,14 @@ export function Checkbox({
 
 const styles = StyleSheet.create({
   checkbox: {
-    width: 22,
-    height: 22,
-    borderWidth: 1.5,
+    alignItems: "center",
+    backgroundColor: theme.colors.surface,
     borderColor: theme.colors.border,
     borderRadius: 4,
-    alignItems: "center",
+    borderWidth: 1.5,
+    height: 22,
     justifyContent: "center",
-    backgroundColor: theme.colors.surface,
+    width: 22,
   },
   checkboxChecked: {
     backgroundColor: theme.colors.primary,

@@ -21,8 +21,21 @@ export interface FinalizedSet {
   previous: boolean;
 }
 
+interface RoutineExercise {
+  routine_exercise_id: number;
+  order: number;
+  sets: number;
+  exercise_id: number;
+  exercises: { name: string };
+}
+
+export interface Routine {
+  name: string;
+  routine_exercises: RoutineExercise[];
+}
+
 interface TrainingSessionViewProps {
-  routine: any;
+  routine: Routine;
   onEnd: (payload: FinalizedSet[], duration: number) => Promise<boolean>;
 }
 
@@ -77,17 +90,10 @@ export function TrainingSessionView({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background, padding: 16 },
-  title: {
-    fontSize: 22,
-    fontFamily: "Roboto_500Medium",
-    color: theme.colors.textPrimary,
-    marginBottom: 8,
-  },
-  timer: { fontSize: 16, color: theme.colors.textSecondary, marginBottom: 16 },
+  container: { backgroundColor: theme.colors.background, flex: 1, padding: 16 },
   endButton: {
-    backgroundColor: theme.colors.primary,
     alignItems: "center",
+    backgroundColor: theme.colors.primary,
     borderRadius: 8,
     paddingHorizontal: 20,
     paddingVertical: 12,
@@ -97,5 +103,12 @@ const styles = StyleSheet.create({
     color: theme.colors.textPrimary,
     fontSize: 16,
     fontWeight: "600",
+  },
+  timer: { color: theme.colors.textSecondary, fontSize: 16, marginBottom: 16 },
+  title: {
+    color: theme.colors.textPrimary,
+    fontFamily: "Roboto_500Medium",
+    fontSize: 22,
+    marginBottom: 8,
   },
 });

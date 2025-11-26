@@ -102,17 +102,17 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   sectionTitle: {
+    color: theme.colors.textPrimary,
     fontSize: 18,
     fontWeight: "600",
-    color: theme.colors.textPrimary,
     marginBottom: 15,
   },
   titleRow: {
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "flex-start",
+    flexDirection: "row",
     gap: 230,
-    marginTop: 20,
+    justifyContent: "flex-start",
     marginBottom: 10,
+    marginTop: 20,
   },
 });
