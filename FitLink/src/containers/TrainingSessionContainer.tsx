@@ -34,7 +34,11 @@ export default function TrainingSessionContainer({
   if (loading || !routine) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <ActivityIndicator
+          size="large"
+          color={theme.colors.primary}
+          testID="activity-indicator"
+        />
       </View>
     );
   }
