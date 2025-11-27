@@ -16,7 +16,7 @@ const TabLayout: React.FC = () => {
     <View style={{ flex: 1 }}>
       <Tabs
         screenOptions={{
-          headerShown: false,
+          headerShown: true,
           tabBarActiveTintColor: theme.colors.primary,
           tabBarStyle: {
             backgroundColor: theme.colors.surface,
@@ -30,26 +30,19 @@ const TabLayout: React.FC = () => {
         }}
       >
         <Tabs.Screen
-          name="home"
-          options={{
-            title: "Home",
-            tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
-          }}
-        />
-        <Tabs.Screen
-          name="routines"
-          options={{
-            title: "Rutinas",
-            tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
-          }}
-        />
-        <Tabs.Screen
           name="history"
           options={{
             title: "Historial",
             tabBarIcon: ({ color }) => (
               <TabBarIcon name="history" color={color} />
             ),
+          }}
+        />
+        <Tabs.Screen
+          name="routines"
+          options={{
+            title: "Entrenamiento",
+            tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
           }}
         />
         <Tabs.Screen

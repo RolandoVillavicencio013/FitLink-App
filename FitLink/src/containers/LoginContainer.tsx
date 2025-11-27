@@ -45,7 +45,7 @@ export const useLoginContainer = () => {
     try {
       setLoading(true);
       await loginUser(formData.email, formData.password);
-      router.replace('/(tabs)/home');
+      router.replace('/(tabs)/routines');
     } catch (err: unknown) {
       if (err instanceof Error && err.message.includes('Invalid login credentials')) {
         setErrors({ email: 'Credenciales inválidas' });

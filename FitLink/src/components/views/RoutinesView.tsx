@@ -10,6 +10,7 @@ export const RoutinesView: React.FC = () => {
     setSearchQuery,
     navigateToRoutine,
     navigateToAddRoutine,
+    navigateToQuickStart,
   } = useRoutinesContainer();
 
   return (
@@ -20,6 +21,7 @@ export const RoutinesView: React.FC = () => {
       onSearchChange={setSearchQuery}
       onRoutinePress={navigateToRoutine}
       onAddRoutine={navigateToAddRoutine}
+      onQuickStart={navigateToQuickStart}
     />
   );
 };
