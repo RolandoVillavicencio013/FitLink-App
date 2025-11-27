@@ -185,7 +185,7 @@ describe('AddRoutineContainer', () => {
     await result.current.handleSubmit();
     
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Error', 'No se pudo crear la rutina');
+      expect(alertSpy).toHaveBeenCalledWith('Error', 'No se pudo crear la rutina o ejercicios');
     });
   });
 
@@ -232,7 +232,7 @@ describe('AddRoutineContainer', () => {
     await result.current.handleSubmit();
     
     await waitFor(() => {
-      expect(alertSpy).toHaveBeenCalledWith('Error', 'No se pudieron agregar los ejercicios');
+      expect(alertSpy).toHaveBeenCalledWith('Error', 'No se pudo crear la rutina o ejercicios');
     });
   });
 

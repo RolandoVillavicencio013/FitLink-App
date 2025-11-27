@@ -1,3 +1,8 @@
+jest.mock("expo-router", () => ({
+  useRouter: () => ({
+    replace: jest.fn(),
+  }),
+}));
 import React from 'react';
 import { render, waitFor } from '@testing-library/react-native';
 import TrainingSessionContainer from '../../src/containers/TrainingSessionContainer';
@@ -144,7 +149,7 @@ describe('TrainingSessionContainer', () => {
     ];
     const mockDuration = 1800;
 
-    onEndCallback(mockPayload, mockDuration);
+    await onEndCallback(mockPayload, mockDuration);
 
     expect(mockEndSession).toHaveBeenCalledWith('1', mockPayload, mockDuration);
   });
