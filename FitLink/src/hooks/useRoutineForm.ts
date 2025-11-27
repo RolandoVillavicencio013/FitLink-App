@@ -184,7 +184,7 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
       description !== initial.description ||
       estimatedTime !== initial.estimatedTime ||
       isShared !== initial.isShared ||
-      JSON.stringify(selectedExercises.toSorted((a, b) => a - b)) !== JSON.stringify(initial.selectedExercises.toSorted((a, b) => a - b)) ||
+      JSON.stringify([...selectedExercises].sort((a, b) => a - b)) !== JSON.stringify([...initial.selectedExercises].sort((a, b) => a - b)) ||
       JSON.stringify(exerciseSets) !== JSON.stringify(initial.exerciseSets)
     );
   };
