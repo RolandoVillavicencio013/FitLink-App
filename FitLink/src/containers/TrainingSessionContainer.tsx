@@ -1,3 +1,4 @@
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { theme } from "../constants/theme";
@@ -12,9 +13,8 @@ interface TrainingSessionContainerProps {
   routineId: string;
 }
 
-export default function TrainingSessionContainer({
-  routineId,
-}: TrainingSessionContainerProps) {
+export default function TrainingSessionContainer({ routineId }: TrainingSessionContainerProps) {
+  const router = useRouter();
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,9 +28,12 @@ export default function TrainingSessionContainer({
     loadRoutine();
   }, [routineId]);
 
-  const handleEndSession = (payload: FinalizedSet[], duration: number) =>
-    endSession(routineId, payload, duration);
-
+  const handleEndSession = async (payload: FinalizedSet[], duration: number): Promise<boolean> => {
+    await endSession(routineId, payload, duration);
+    router.replace("/(tabs)/routines");
+    return true;
+  };
+  
   if (loading || !routine) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
