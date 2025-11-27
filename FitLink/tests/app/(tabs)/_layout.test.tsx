@@ -48,7 +48,7 @@ describe('TabLayout', () => {
     render(<TabLayout />);
     const callArgs = MockTabs.mock.calls[0][0];
     expect(callArgs.screenOptions).toMatchObject({
-      headerShown: false,
+      headerShown: true,
       tabBarActiveTintColor: '#007AFF',
       tabBarStyle: {
         backgroundColor: '#ffffff',
@@ -72,14 +72,14 @@ describe('TabLayout', () => {
     expect(TabsScreen).toHaveBeenCalled();
   });
 
-  it('should render home screen with correct options', () => {
+  it('should render history screen with correct options', () => {
     render(<TabLayout />);
-    const call = TabsScreen.mock.calls.find(call => call[0]?.name === 'home');
+    const call = TabsScreen.mock.calls.find(call => call[0]?.name === 'history');
     expect(call).toBeDefined();
     expect(call[0]).toMatchObject({
-      name: 'home',
+      name: 'history',
       options: expect.objectContaining({
-        title: 'Home',
+        title: 'Historial',
       }),
     });
   });
@@ -91,7 +91,7 @@ describe('TabLayout', () => {
     expect(call[0]).toMatchObject({
       name: 'routines',
       options: expect.objectContaining({
-        title: 'Rutinas',
+        title: 'Entrenamiento',
       }),
     });
   });
@@ -120,14 +120,14 @@ describe('TabLayout', () => {
     });
   });
 
-  it('should render all four Tabs.Screen components', () => {
+  it('should render all three Tabs.Screen components', () => {
     render(<TabLayout />);
-    expect(TabsScreen).toHaveBeenCalledTimes(4);
+    expect(TabsScreen).toHaveBeenCalledTimes(3);
   });
 
-  it('should have tabBarIcon function in home screen options', () => {
+  it('should have tabBarIcon function in history screen options', () => {
     render(<TabLayout />);
-    const call = TabsScreen.mock.calls.find(call => call[0]?.name === 'home');
+    const call = TabsScreen.mock.calls.find(call => call[0]?.name === 'history');
     expect(call[0].options.tabBarIcon).toBeDefined();
     expect(typeof call[0].options.tabBarIcon).toBe('function');
   });

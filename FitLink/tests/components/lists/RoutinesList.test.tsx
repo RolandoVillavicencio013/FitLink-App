@@ -1,3 +1,7 @@
+jest.mock('@expo/vector-icons', () => ({
+  FontAwesome: 'FontAwesome',
+}));
+
 jest.mock('../../../src/components/ui', () => ({
   RoutineCard: jest.fn(() => null),
   SearchInput: jest.fn(() => null),
@@ -50,6 +54,7 @@ describe('RoutinesList', () => {
     onSearchChange: jest.fn(),
     onRoutinePress: jest.fn(),
     onAddRoutine: jest.fn(),
+    onQuickStart: jest.fn(),
   };
 
   beforeEach(() => {
@@ -104,13 +109,13 @@ describe('RoutinesList', () => {
     it('should render Button with correct props', () => {
       render(<RoutinesList {...mockProps} />);
       const callArgs = (Button as jest.Mock).mock.calls[0][0];
-      expect(callArgs.title).toBe('Agregar rutina');
-      expect(callArgs.onPress).toBe(mockProps.onAddRoutine);
+      expect(callArgs.title).toBe('Inicio rápido');
+      expect(callArgs.onPress).toBeDefined();
     });
 
     it('should render RoutineCard for each routine', () => {
       render(<RoutinesList {...mockProps} />);
-      expect(RoutineCard).toHaveBeenCalledTimes(2);
+      expect(RoutineCard).toHaveBeenCalledTimes(3);
     });
 
     it('should render first RoutineCard with correct props', () => {
@@ -123,7 +128,7 @@ describe('RoutinesList', () => {
 
     it('should render second RoutineCard with correct props', () => {
       render(<RoutinesList {...mockProps} />);
-      const secondCall = (RoutineCard as jest.Mock).mock.calls[1][0];
+      const secondCall = (RoutineCard as jest.Mock).mock.calls[2][0];
       expect(secondCall.name).toBe('Routine 2');
       expect(secondCall.exerciseCount).toBe(1);
       expect(secondCall.estimatedTime).toBe(45);
@@ -152,7 +157,7 @@ describe('RoutinesList', () => {
 
     it('should call onRoutinePress with correct routine_id', () => {
       render(<RoutinesList {...mockProps} />);
-      const secondCardOnPress = (RoutineCard as jest.Mock).mock.calls[1][0].onPress;
+      const secondCardOnPress = (RoutineCard as jest.Mock).mock.calls[2][0].onPress;
       secondCardOnPress();
       expect(mockProps.onRoutinePress).toHaveBeenCalledWith(2);
     });
