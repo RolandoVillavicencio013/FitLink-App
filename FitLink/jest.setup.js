@@ -3,21 +3,8 @@ process.env.EXPO_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY = 'test-anon-key';
 
 // Suppress console errors and warnings during tests
-const originalError = console.error;
-const originalWarn = console.warn;
-
-beforeAll(() => {
-  // Suppress all console.error in tests
-  console.error = jest.fn();
-  
-  // Suppress all console.warn in tests
-  console.warn = jest.fn();
-});
-
-afterAll(() => {
-  console.error = originalError;
-  console.warn = originalWarn;
-});
+global.console.error = jest.fn();
+global.console.warn = jest.fn();
 
 jest.mock('expo-router', () => ({
   useRouter: jest.fn(),
