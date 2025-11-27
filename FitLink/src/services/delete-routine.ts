@@ -44,33 +44,35 @@ export async function deleteRoutine({ routineId, onSuccess }: DeleteRoutineParam
         {
           text: "Eliminar",
           style: "destructive",
-          onPress: async () => {
-            try {
-              const { error } = await supabase
-                .from('routines')
-                .delete()
-                .eq('routine_id', routineId);
+          onPress: () => {
+            (async () => {
+              try {
+                const { error } = await supabase
+                  .from('routines')
+                  .delete()
+                  .eq('routine_id', routineId);
 
-              if (error) {
-                console.error('Error eliminando rutina:', error);
-                Alert.alert('Error', 'No se pudo eliminar la rutina');
-                return;
+                if (error) {
+                  console.error('Error eliminando rutina:', error);
+                  Alert.alert('Error', 'No se pudo eliminar la rutina');
+                  return;
+                }
+
+                Alert.alert(
+                  'Éxito', 
+                  'La rutina se eliminó correctamente',
+                  [
+                    {
+                      text: 'OK',
+                      onPress: onSuccess
+                    }
+                  ]
+                );
+              } catch (err) {
+                console.error('Error inesperado:', err);
+                Alert.alert('Error', 'Ocurrió un error al eliminar la rutina');
               }
-
-              Alert.alert(
-                'Éxito', 
-                'La rutina se eliminó correctamente',
-                [
-                  {
-                    text: 'OK',
-                    onPress: onSuccess
-                  }
-                ]
-              );
-            } catch (err) {
-              console.error('Error inesperado:', err);
-              Alert.alert('Error', 'Ocurrió un error al eliminar la rutina');
-            }
+            })();
           }
         }
       ]
