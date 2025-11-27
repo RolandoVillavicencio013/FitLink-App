@@ -6,6 +6,88 @@ import { supabase } from '../services/supabase';
 import { createRoutine } from '../services/repositories/routineRepository';
 import { insertRoutineExercises } from '../services/repositories/exerciseRepository';
 
+// Tipos auxiliares
+type SupabaseUser = { id: string } | null;
+type SupabaseError = { message?: string } | null;
+type DbUser = { user_id: number } | null;
+type Routine = { routine_id: number } | null;
+type RoutineError = { message?: string } | string | null;
+type ExercisesError = { message?: string } | string | null;
+
+function showAlert(title: string, message: string) {
+  if (Platform.OS === 'web') {
+    window.alert(message);
+  } else {
+    Alert.alert(title, message);
+  }
+}
+
+function isUserInvalid(user: SupabaseUser, error: SupabaseError): boolean {
+  return !!error || !user;
+}
+
+function isDbUserInvalid(dbUser: DbUser, error: SupabaseError): boolean {
+  return !!error || !dbUser;
+}
+
+function isRoutineInvalid(routine: Routine, error: RoutineError): boolean {
+  return !!error || !routine;
+}
+
+function hasExercisesError(error: ExercisesError): boolean {
+  return !!error;
+}
+
+async function getCurrentUser() {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  return { user, error };
+}
+
+async function getDbUser(userId: string) {
+  const { data, error } = await supabase
+    .from("users")
+    .select("user_id")
+    .eq("auth_id", userId)
+    .single();
+  return { dbUser: data as DbUser, error };
+}
+
+type AddRoutineFormData = {
+  name: string;
+  description: string;
+  estimatedTime: number;
+  isShared: boolean;
+  selectedExercises: number[];
+  exerciseSets: { [exerciseId: number]: number };
+};
+
+async function createRoutineAndExercises(userId: number, formData: AddRoutineFormData) {
+  const { routine, error: routineError } = await createRoutine(userId, {
+    name: formData.name,
+    description: formData.description,
+    estimated_time: formData.estimatedTime,
+    is_shared: formData.isShared,
+  });
+  if (isRoutineInvalid(routine, routineError)) {
+    return { error: routineError || 'No se pudo crear la rutina' };
+  }
+
+  const exercises = formData.selectedExercises.map((exerciseId: number) => ({
+    exercise_id: exerciseId,
+    sets: formData.exerciseSets[exerciseId],
+  }));
+
+  const { error: exercisesError } = await insertRoutineExercises(
+    routine!.routine_id,
+    exercises
+  );
+  if (hasExercisesError(exercisesError)) {
+    return { error: exercisesError || 'No se pudieron agregar los ejercicios' };
+  }
+
+  return { routine };
+}
+
 export function useAddRoutineContainer() {
   const router = useRouter();
   const formState = useRoutineForm();
@@ -20,67 +102,25 @@ export function useAddRoutineContainer() {
 
     try {
       // Obtener usuario actual
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      if (userError || !user) {
-        if (Platform.OS === 'web') {
-          window.alert('Usuario no autenticado');
-        } else {
-          Alert.alert('Error', 'Usuario no autenticado');
-        }
+      const { user, error: userError } = await getCurrentUser();
+      if (isUserInvalid(user, userError)) {
+        showAlert('Error', 'Usuario no autenticado');
         return;
       }
 
       // Obtener user_id de la tabla users
-      const { data: dbUser, error: dbUserError } = await supabase
-        .from("users")
-        .select("user_id")
-        .eq("auth_id", user.id)
-        .single();
-
-      if (dbUserError || !dbUser) {
+      const { dbUser, error: dbUserError } = await getDbUser(user!.id);
+      if (isDbUserInvalid(dbUser, dbUserError)) {
         console.error(dbUserError);
-        if (Platform.OS === 'web') {
-          window.alert('Error al obtener datos del usuario');
-        } else {
-          Alert.alert('Error', 'No se pudieron obtener tus datos');
-        }
+        showAlert('Error', 'No se pudieron obtener tus datos');
         return;
       }
 
-      const { routine, error: routineError } = await createRoutine(dbUser.user_id, {
-        name: formData.name,
-        description: formData.description,
-        estimated_time: formData.estimatedTime,
-        is_shared: formData.isShared,
-      });
-
-      if (routineError || !routine) {
-        console.error(routineError);
-        if (Platform.OS === 'web') {
-          window.alert('Error al crear la rutina');
-        } else {
-          Alert.alert('Error', 'No se pudo crear la rutina');
-        }
-        return;
-      }
-
-      const exercises = formData.selectedExercises.map((exerciseId) => ({
-        exercise_id: exerciseId,
-        sets: formData.exerciseSets[exerciseId],
-      }));
-
-      const { error: exercisesError } = await insertRoutineExercises(
-        routine.routine_id,
-        exercises
-      );
-
-      if (exercisesError) {
-        console.error(exercisesError);
-        if (Platform.OS === 'web') {
-          window.alert('Error al agregar ejercicios');
-        } else {
-          Alert.alert('Error', 'No se pudieron agregar los ejercicios');
-        }
+      // Crear rutina y ejercicios
+      const result = await createRoutineAndExercises(dbUser!.user_id, formData);
+      if (result.error) {
+        console.error(result.error);
+        showAlert('Error', typeof result.error === 'string' ? result.error : 'No se pudo crear la rutina o agregar los ejercicios');
         return;
       }
 
@@ -88,11 +128,7 @@ export function useAddRoutineContainer() {
       router.replace("/(tabs)/routines");
     } catch (err) {
       console.error(err);
-      if (Platform.OS === 'web') {
-        window.alert('Error inesperado');
-      } else {
-        Alert.alert('Error', 'Ocurrió un error inesperado');
-      }
+      showAlert('Error', 'Ocurrió un error inesperado');
     } finally {
       setIsLoading(false);
     }
