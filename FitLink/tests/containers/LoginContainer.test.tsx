@@ -184,7 +184,7 @@ describe('useLoginContainer', () => {
       });
 
       // Assert
-      expect(mockRouter.replace).toHaveBeenCalledWith('/(tabs)/home');
+      expect(mockRouter.replace).toHaveBeenCalledWith('/(tabs)/routines');
     });
 
     it('should set loading to true during login', async () => {
