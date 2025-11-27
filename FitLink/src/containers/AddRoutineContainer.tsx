@@ -69,7 +69,7 @@ async function createRoutineAndExercises(userId: number, formData: AddRoutineFor
     is_shared: formData.isShared,
   });
   if (isRoutineInvalid(routine, routineError)) {
-    return { error: routineError || 'No se pudo crear la rutina' };
+    return { error: routineError || 'No se pudo crear la rutina o ejercicios' };
   }
 
   const exercises = formData.selectedExercises.map((exerciseId: number) => ({
@@ -82,7 +82,7 @@ async function createRoutineAndExercises(userId: number, formData: AddRoutineFor
     exercises
   );
   if (hasExercisesError(exercisesError)) {
-    return { error: exercisesError || 'No se pudieron agregar los ejercicios' };
+    return { error: exercisesError || 'No se pudo agregar los ejercicios' };
   }
 
   return { routine };
@@ -120,7 +120,7 @@ export function useAddRoutineContainer() {
       const result = await createRoutineAndExercises(dbUser!.user_id, formData);
       if (result.error) {
         console.error(result.error);
-        showAlert('Error', typeof result.error === 'string' ? result.error : 'No se pudo crear la rutina o agregar los ejercicios');
+        showAlert('Error', typeof result.error === 'string' ? result.error : 'No se pudo crear la rutina o ejercicios');
         return;
       }
 
