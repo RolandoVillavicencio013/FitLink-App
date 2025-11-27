@@ -55,7 +55,7 @@ export default function RoutineForm({
   removeExercise,
   handleSetsChange,
   handleSubmit,
-}: RoutineFormProps) {
+}: Readonly<RoutineFormProps>) {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -73,7 +73,7 @@ export default function RoutineForm({
           value={name}
           onChangeText={handleNameChange}
         />
-        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+        {!!errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
         <Text style={styles.label}>Descripción de la rutina</Text>
         <TextInput
@@ -83,7 +83,7 @@ export default function RoutineForm({
           onChangeText={handleDescriptionChange}
           multiline
         />
-        {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
+        {!!errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
 
         <Text style={styles.label}>Tiempo estimado</Text>
         <TextInput
@@ -94,7 +94,7 @@ export default function RoutineForm({
           value={estimatedTime}
           onChangeText={handleEstimatedTimeChange}
         />
-        {errors.estimatedTime && <Text style={styles.errorText}>{errors.estimatedTime}</Text>}
+        {!!errors.estimatedTime && <Text style={styles.errorText}>{errors.estimatedTime}</Text>}
 
         <Text style={styles.label}>Ejercicios Seleccionados ({selectedExercises.length})</Text>
         {selectedExercisesDetails.length > 0 ? (
@@ -124,8 +124,8 @@ export default function RoutineForm({
         ) : (
           <Text style={styles.emptyText}>No has agregado ejercicios aún</Text>
         )}
-        {errors.exercises && <Text style={styles.errorText}>{errors.exercises}</Text>}
-        {errors.sets && <Text style={styles.errorText}>{errors.sets}</Text>}
+        {!!errors.exercises && <Text style={styles.errorText}>{errors.exercises}</Text>}
+        {!!errors.sets && <Text style={styles.errorText}>{errors.sets}</Text>}
 
         <Text style={styles.label}>Agregar Ejercicios</Text>
         <TextInput
