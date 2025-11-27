@@ -4,12 +4,16 @@ import React from "react";
 import { View } from "react-native";
 import { theme } from '../../constants/theme';
 
-function TabBarIcon(props: {
+function TabBarIcon(props: Readonly<{
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
-}) {
+}>) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
+
+const HistoryIcon = ({ color }: { color: string }) => <TabBarIcon name="history" color={color} />;
+const HomeIcon = ({ color }: { color: string }) => <TabBarIcon name="home" color={color} />;
+const UserIcon = ({ color }: { color: string }) => <TabBarIcon name="user" color={color} />;
 
 const TabLayout: React.FC = () => {
   return (
@@ -33,23 +37,21 @@ const TabLayout: React.FC = () => {
           name="history"
           options={{
             title: "Historial",
-            tabBarIcon: ({ color }) => (
-              <TabBarIcon name="history" color={color} />
-            ),
+            tabBarIcon: HistoryIcon,
           }}
         />
         <Tabs.Screen
           name="routines"
           options={{
             title: "Entrenamiento",
-            tabBarIcon: ({ color }) => <TabBarIcon name="home" color={color} />,
+            tabBarIcon: HomeIcon,
           }}
         />
         <Tabs.Screen
           name="profile"
           options={{
             title: "Perfil",
-            tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
+            tabBarIcon: UserIcon,
           }}
         />
       </Tabs>
